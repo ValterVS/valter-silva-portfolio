@@ -2,13 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { MotionProvider } from "@/components/MotionProvider";
 import { htmlLang, isLocale, localePath, locales, ogLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/ui";
 import { profile, siteUrl } from "@/data/profile";
-import { getResumeUrl } from "@/lib/resume";
 import "../globals.css";
 
 const sans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
@@ -92,15 +89,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
         >
           {dict.a11y.skip}
         </a>
-        <MotionProvider>
-          <Header
-            locale={locale}
-            dict={{ nav: dict.nav, actions: dict.actions, a11y: dict.a11y }}
-            resumeUrl={getResumeUrl(locale)}
-          />
-          <main id="content">{children}</main>
-          <Footer locale={locale} dict={dict} />
-        </MotionProvider>
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

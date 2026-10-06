@@ -32,6 +32,11 @@ export const profile = {
     en: "Software developer focused on building modern applications, APIs and backend systems — solutions that connect technology to real problems.",
   } satisfies Localized,
 
+  statement: {
+    pt: "Construo software para transformar problemas reais em produtos digitais.",
+    en: "I build software that turns real problems into digital products.",
+  } satisfies Localized,
+
   focus: {
     pt: "Backend com Java e Spring Boot",
     en: "Backend with Java and Spring Boot",

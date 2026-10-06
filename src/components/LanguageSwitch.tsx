@@ -1,28 +1,19 @@
 "use client";
 
 import { motion } from "motion/react";
-import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { htmlLang, isLocale, localeCookie, localePath, locales, type Locale } from "@/i18n/config";
+import { htmlLang, locales, type Locale } from "@/i18n/config";
+import { useSwitchLocale } from "@/lib/locale-switch";
 import { cx } from "@/lib/styles";
 
-function stripLocale(pathname: string) {
-  const segments = pathname.split("/");
-  if (!isLocale(segments[1] ?? "")) return pathname;
-  return "/" + segments.slice(2).join("/");
-}
-
 export function LanguageSwitch({ locale, label }: { locale: Locale; label: string }) {
-  const pathname = usePathname();
-  const router = useRouter();
+  const switchLocale = useSwitchLocale();
   const [selected, setSelected] = useState(locale);
 
   function select(next: Locale) {
     if (next === selected) return;
     setSelected(next);
-    document.cookie = `${localeCookie}=${next}; path=/; max-age=31536000; samesite=lax`;
-    const target = localePath(next, stripLocale(pathname)) + window.location.hash;
-    router.push(target, { scroll: false });
+    switchLocale(next);
   }
 
   return (

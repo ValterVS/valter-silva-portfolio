@@ -56,6 +56,23 @@ Todo texto que aparece no site está em `src/data` ou em `src/i18n/ui.ts`. Campo
 
 **Novo idioma:** inclua o código em `locales` (`src/i18n/config.ts`). O TypeScript passa a apontar todos os textos que precisam da nova tradução.
 
+## Versão imersiva (V2)
+
+Experimental, na branch `v2-immersive`, em `/v2` (português) e `/en/v2` (inglês). Usa os mesmos dados de `src/data`; só a apresentação muda. Fica fora dos buscadores (`noindex`) enquanto for experimental.
+
+```
+src/app/[locale]/v2/        rota da V2
+src/components/v2/          seções, header, cantos e loader
+src/components/three/       cena 3D: PortfolioScene, ValterAvatar, SceneLights, FloatingTech, SceneParticles
+src/i18n/immersive.ts       textos de interface da V2
+```
+
+**Avatar:** coloque o modelo em `public/models/valter-avatar.glb`. Ele é detectado no build e escalado para a altura e o topo definidos em `ValterAvatar.tsx` (`AVATAR_HEIGHT` e `AVATAR_TOP`). Se o arquivo tiver um clip com "idle" no nome, ele toca; sem clip, o avatar ganha só movimento procedural. Sem o arquivo, a cena mostra um busto abstrato. Prefira um GLB leve (até alguns MB, texturas de 1K a 2K).
+
+**Coreografia:** as posições do avatar em cada momento da página ficam em `poses` (`PortfolioScene.tsx`). As tecnologias que sobem durante o scroll ficam em `flow` (`TechFlow.tsx`), e a composição da hero em `composition` (`HeroSection.tsx`).
+
+**Promover a V2 para a raiz:** mova `src/app/[locale]/(classic)/page.tsx` para outra rota (por exemplo `(classic)/classic/page.tsx`), mova `src/app/[locale]/v2/page.tsx` para `src/app/[locale]/page.tsx` e remova o `robots: { index: false }` da metadata dela.
+
 ## Currículo
 
 Coloque os arquivos com estes nomes:

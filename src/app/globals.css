@@ -18,6 +18,12 @@
   --color-accent: #38bdf8;
   --color-accent-soft: #7dd3fc;
   --color-accent-2: #22d3ee;
+
+  /* Versão imersiva (/v2) */
+  --color-ink: #080b11;
+  --color-gold: #d6a640;
+  --color-gold-soft: #ecc97a;
+  --color-electric: #4f7cff;
 }
 
 @layer base {
@@ -111,5 +117,43 @@
     .grid-fill > :last-child:nth-child(3n + 2) {
       grid-column: span 2;
     }
+  }
+
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px currentColor;
+  }
+
+  /* Detalhes que aparecem no hover só em dispositivos com mouse; no toque ficam sempre visíveis */
+  @media (hover: hover) and (min-width: 1024px) {
+    .hover-reveal {
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition:
+        grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.3s ease;
+    }
+
+    .group:hover .hover-reveal,
+    .group:focus-within .hover-reveal {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
+@keyframes loader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
   }
 }

@@ -5,6 +5,9 @@ export type Experience = {
   role: string;
   kind: "development" | "support";
   client?: string;
+  // Formato AAAA-MM; end vazio significa emprego atual
+  start: string;
+  end?: string;
   period: Localized;
   summary: Localized;
   highlights: Localized<string[]>;
@@ -18,6 +21,8 @@ export const experience: Experience[] = [
     role: "Customer Support Analyst II",
     kind: "support",
     client: "SABESP",
+    start: "2026-01",
+    end: "2026-06",
     period: {
       pt: "Janeiro de 2026 — Junho de 2026",
       en: "January 2026 — June 2026",
@@ -46,6 +51,8 @@ export const experience: Experience[] = [
     company: "Linx",
     role: "Junior Software Developer",
     kind: "development",
+    start: "2025-09",
+    end: "2025-11",
     period: {
       pt: "Setembro de 2025 — Novembro de 2025",
       en: "September 2025 — November 2025",
