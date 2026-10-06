@@ -67,7 +67,13 @@ src/components/three/       cena 3D: PortfolioScene, ValterAvatar, SceneLights, 
 src/i18n/immersive.ts       textos de interface da V2
 ```
 
-**Avatar:** coloque o modelo em `public/models/valter-avatar.glb`. Ele é detectado no build e escalado para a altura e o topo definidos em `ValterAvatar.tsx` (`AVATAR_HEIGHT` e `AVATAR_TOP`). Se o arquivo tiver um clip com "idle" no nome, ele toca; sem clip, o avatar ganha só movimento procedural. Sem o arquivo, a cena mostra um busto abstrato. Prefira um GLB leve (até alguns MB, texturas de 1K a 2K).
+**Avatar:** tudo fica em `ValterAvatar.tsx` e os arquivos em `public/models/`. A cena usa o primeiro que existir:
+
+1. `valter-avatar.glb` — modelo 3D definitivo. É escalado para `AVATAR_HEIGHT`/`AVATAR_TOP`. Se tiver um clip com "idle" no nome, ele toca; morph targets com "blink" ou "smile" no nome são usados para piscar e para um sorriso leve. Sem clip, a cabeça (osso com "head" no nome) ganha só movimento procedural.
+2. `valter-portrait.webp` (ou `.jpg`/`.png`) — retrato em relevo 2.5D: a imagem ganha profundidade aproximada e reage ao cursor com giros pequenos. Se trocar a imagem, ajuste os pontos de referência em `portraitShape`.
+3. Sem nenhum dos dois, um busto abstrato.
+
+Para o GLB: busto (cabeça e ombros), virado para +Z, Y para cima, camiseta preta lisa, até ~5 MB e texturas de 1K a 2K.
 
 **Coreografia:** as posições do avatar em cada momento da página ficam em `poses` (`PortfolioScene.tsx`). As tecnologias que sobem durante o scroll ficam em `flow` (`TechFlow.tsx`), e a composição da hero em `composition` (`HeroSection.tsx`).
 

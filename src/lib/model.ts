@@ -1,9 +1,16 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
+import type { AvatarAssets } from "@/components/three/ValterAvatar";
 
-// Coloque o modelo definitivo em public/models/valter-avatar.glb. Sem ele, a cena usa o busto abstrato.
-const avatarPath = "/models/valter-avatar.glb";
+// Arquivos do avatar em public/models. Trocar o asset não exige mudar código.
+const modelFile = "/models/valter-avatar.glb";
+const portraitFiles = ["/models/valter-portrait.webp", "/models/valter-portrait.jpg", "/models/valter-portrait.png"];
 
-export function getAvatarUrl() {
-  return existsSync(path.join(process.cwd(), "public", avatarPath)) ? avatarPath : null;
+const exists = (file: string) => existsSync(path.join(process.cwd(), "public", file));
+
+export function getAvatarAssets(): AvatarAssets {
+  return {
+    model: exists(modelFile) ? modelFile : null,
+    portrait: portraitFiles.find(exists) ?? null,
+  };
 }

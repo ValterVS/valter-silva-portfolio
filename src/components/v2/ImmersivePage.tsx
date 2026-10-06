@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import type { ImmersiveDictionary } from "@/i18n/immersive";
 import { useCompact, useFinePointer, useQuality, useReducedMotion } from "@/lib/media";
+import type { AvatarAssets } from "@/components/three/ValterAvatar";
 import type { ImmersiveContent } from "./content";
 import { Corners } from "./Corners";
 import { AboutSection } from "./AboutSection";
@@ -24,14 +25,14 @@ type ImmersivePageProps = {
   locale: Locale;
   ui: ImmersiveDictionary;
   content: ImmersiveContent;
-  avatarUrl: string | null;
+  avatar: AvatarAssets;
   resumeUrl: string | null;
   classicHref: string;
 };
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
-export function ImmersivePage({ locale, ui, content, avatarUrl, resumeUrl, classicHref }: ImmersivePageProps) {
+export function ImmersivePage({ locale, ui, content, avatar, resumeUrl, classicHref }: ImmersivePageProps) {
   const quality = useQuality();
   const reduced = useReducedMotion();
   const compact = useCompact();
@@ -93,7 +94,7 @@ export function ImmersivePage({ locale, ui, content, avatarUrl, resumeUrl, class
       {showScene && (
         <motion.div aria-hidden="true" className="pointer-events-none fixed inset-0 z-10" style={{ opacity: stageOpacity }}>
           <PortfolioScene
-            avatarUrl={avatarUrl}
+            avatar={avatar}
             progress={{ hero, tech, contact }}
             pointer={{ x: pointerX, y: pointerY }}
             quality={quality}

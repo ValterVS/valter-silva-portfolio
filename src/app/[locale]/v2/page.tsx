@@ -4,7 +4,7 @@ import { ImmersivePage } from "@/components/v2/ImmersivePage";
 import { buildContent } from "@/components/v2/content";
 import { isLocale, localePath } from "@/i18n/config";
 import { getImmersiveDictionary } from "@/i18n/immersive";
-import { getAvatarUrl } from "@/lib/model";
+import { getAvatarAssets } from "@/lib/model";
 import { getResumeUrl } from "@/lib/resume";
 
 type PageProps = { params: Promise<{ locale: string }> };
@@ -32,7 +32,7 @@ export default async function ImmersiveRoute({ params }: PageProps) {
       locale={locale}
       ui={getImmersiveDictionary(locale)}
       content={buildContent(locale)}
-      avatarUrl={getAvatarUrl()}
+      avatar={getAvatarAssets()}
       resumeUrl={getResumeUrl(locale)}
       classicHref={localePath(locale)}
     />

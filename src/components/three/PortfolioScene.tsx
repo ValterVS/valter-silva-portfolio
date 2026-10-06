@@ -7,7 +7,7 @@ import * as THREE from "three";
 import { FloatingTech } from "./FloatingTech";
 import { SceneLights } from "./SceneLights";
 import { SceneParticles } from "./SceneParticles";
-import { ValterAvatar, type Pointer } from "./ValterAvatar";
+import { ValterAvatar, type AvatarAssets, type Pointer } from "./ValterAvatar";
 
 export type SceneProgress = {
   hero: MotionValue<number>;
@@ -16,7 +16,7 @@ export type SceneProgress = {
 };
 
 type PortfolioSceneProps = {
-  avatarUrl: string | null;
+  avatar: AvatarAssets;
   progress: SceneProgress;
   pointer: Pointer;
   quality: "full" | "lite";
@@ -31,16 +31,16 @@ type Pose = { x: number; y: number; z: number; rotY: number; scale: number };
 // Posição do avatar em cada momento da página. Ajuste aqui para mudar a coreografia do scroll.
 const poses: Record<"wide" | "compact", Record<"hero" | "about" | "stack" | "contact", Pose>> = {
   wide: {
-    hero: { x: 0, y: -0.4, z: 0, rotY: 0, scale: 0.9 },
-    about: { x: 1.6, y: -0.35, z: 0.15, rotY: -0.5, scale: 0.9 },
-    stack: { x: 0.1, y: -0.4, z: -0.5, rotY: 0.2, scale: 0.86 },
-    contact: { x: 1.7, y: -0.4, z: 0, rotY: -0.45, scale: 0.9 },
+    hero: { x: 0, y: -0.02, z: 0, rotY: 0, scale: 1.04 },
+    about: { x: 1.6, y: -0.1, z: 0.1, rotY: -0.5, scale: 0.95 },
+    stack: { x: 0.1, y: -0.2, z: -0.5, rotY: 0.2, scale: 0.9 },
+    contact: { x: 1.7, y: -0.15, z: 0, rotY: -0.45, scale: 0.95 },
   },
   compact: {
-    hero: { x: 0, y: -0.75, z: 0, rotY: 0, scale: 0.8 },
-    about: { x: 0, y: -0.95, z: -0.3, rotY: -0.25, scale: 0.75 },
-    stack: { x: 0, y: -0.7, z: -0.5, rotY: 0.2, scale: 0.75 },
-    contact: { x: 0, y: -0.95, z: 0, rotY: 0, scale: 0.75 },
+    hero: { x: 0, y: -0.55, z: 0, rotY: 0, scale: 0.92 },
+    about: { x: 0, y: -0.8, z: -0.3, rotY: -0.25, scale: 0.85 },
+    stack: { x: 0, y: -0.6, z: -0.5, rotY: 0.2, scale: 0.85 },
+    contact: { x: 0, y: -1.7, z: 0, rotY: 0, scale: 0.85 },
   },
 };
 
@@ -65,26 +65,31 @@ function Choreography({
   progress,
   compact,
   animate,
+  yaw,
   children,
 }: {
   progress: SceneProgress;
   compact: boolean;
   animate: boolean;
+  yaw: number;
   children: ReactNode;
 }) {
   const group = useRef<THREE.Group>(null);
 
-  useFrame(({ camera }, delta) => {
+  useFrame(({ camera, size }, delta) => {
     const set = compact ? poses.compact : poses.wide;
+    // Entre 1024 e 1280 px o avatar diminui um pouco para não encostar no texto das laterais.
+    const start = !compact && size.width < 1280 ? { ...set.hero, y: set.hero.y - 0.15, scale: set.hero.scale * 0.88 } : set.hero;
     const hero = smooth(progress.hero.get());
     const tech = progress.tech.get();
     const stack = smooth(tech / 0.3);
 
-    let pose = mix(set.hero, set.about, hero);
+    let pose = mix(start, set.about, hero);
     pose = mix(pose, set.stack, stack);
     pose.rotY += Math.max(0, tech - 0.3) * 0.7;
     pose = mix(pose, set.contact, smooth(progress.contact.get()));
-    if (!animate) pose = set.hero;
+    if (!animate) pose = { ...start };
+    pose.rotY *= yaw;
 
     const cameraZ = (compact ? 9.4 : 7.6) - hero * 0.35 + stack * 0.45;
     const g = group.current;
@@ -105,7 +110,7 @@ function Choreography({
 
 // Configuração da cena 3D
 export default function PortfolioScene({
-  avatarUrl,
+  avatar,
   progress,
   pointer,
   quality,
@@ -115,6 +120,8 @@ export default function PortfolioScene({
   onReady,
 }: PortfolioSceneProps) {
   const lite = quality === "lite";
+  // O retrato em relevo não aguenta giros grandes, então a coreografia gira menos.
+  const yaw = avatar.model || !avatar.portrait ? 1 : 0.22;
 
   return (
     <Canvas
@@ -127,8 +134,8 @@ export default function PortfolioScene({
     >
       <fog attach="fog" args={["#080b11", 8, 16]} />
       <SceneLights />
-      <Choreography progress={progress} compact={compact} animate={animate}>
-        <ValterAvatar url={avatarUrl} pointer={pointer} animate={animate} />
+      <Choreography progress={progress} compact={compact} animate={animate} yaw={yaw}>
+        <ValterAvatar assets={avatar} pointer={pointer} animate={animate} />
       </Choreography>
       {!lite && <FloatingTech tech={progress.tech} pointer={pointer} animate={animate} />}
       <SceneParticles count={lite ? 90 : 260} pointer={pointer} animate={animate} />
