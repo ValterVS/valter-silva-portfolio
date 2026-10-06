@@ -17,6 +17,7 @@ export type SceneProgress = {
 
 type PortfolioSceneProps = {
   avatar: AvatarAssets;
+  portraitSrc: string | null;
   progress: SceneProgress;
   pointer: Pointer;
   quality: "full" | "lite";
@@ -75,6 +76,7 @@ function Choreography({
   children: ReactNode;
 }) {
   const group = useRef<THREE.Group>(null);
+  const placed = useRef(false);
 
   useFrame(({ camera, size }, delta) => {
     const set = compact ? poses.compact : poses.wide;
@@ -95,8 +97,10 @@ function Choreography({
     const g = group.current;
     if (!g) return;
 
-    // Com movimento reduzido não há interpolação: o avatar fica parado na pose da hero.
-    const rate = animate ? 2.4 : Infinity;
+    // O primeiro quadro já nasce na pose certa (casa com a imagem da hero). Depois, um amortecimento curto
+    // só para suavizar o scroll, sem a sensação de o avatar correr atrás da página.
+    const rate = animate && placed.current ? 7 : Infinity;
+    placed.current = true;
     g.position.x = THREE.MathUtils.damp(g.position.x, pose.x, rate, delta);
     g.position.y = THREE.MathUtils.damp(g.position.y, pose.y, rate, delta);
     g.position.z = THREE.MathUtils.damp(g.position.z, pose.z, rate, delta);
@@ -111,6 +115,7 @@ function Choreography({
 // Configuração da cena 3D
 export default function PortfolioScene({
   avatar,
+  portraitSrc,
   progress,
   pointer,
   quality,
@@ -129,13 +134,12 @@ export default function PortfolioScene({
       camera={{ position: [0, 0.25, compact ? 9.4 : 7.6], fov: 32 }}
       gl={{ antialias: !lite, alpha: true, powerPreference: "high-performance" }}
       frameloop={!active ? "never" : animate ? "always" : "demand"}
-      onCreated={onReady}
       style={{ pointerEvents: "none" }}
     >
       <fog attach="fog" args={["#080b11", 8, 16]} />
       <SceneLights />
       <Choreography progress={progress} compact={compact} animate={animate} yaw={yaw}>
-        <ValterAvatar assets={avatar} pointer={pointer} animate={animate} />
+        <ValterAvatar assets={avatar} portraitSrc={portraitSrc} pointer={pointer} animate={animate} onReady={onReady} />
       </Choreography>
       {!lite && <FloatingTech tech={progress.tech} pointer={pointer} animate={animate} />}
       <SceneParticles count={lite ? 90 : 260} pointer={pointer} animate={animate} />

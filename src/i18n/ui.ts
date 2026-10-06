@@ -5,7 +5,7 @@ const pt = {
   meta: {
     title: "Valter da Silva | Software Developer",
     description:
-      "Portfólio de Valter da Silva, desenvolvedor de software com foco em backend, Java e Spring Boot. Projetos, experiência profissional e contato.",
+      "Valter da Silva, Software Developer e Backend Developer com Java e Spring Boot. Estudante de Engenharia de Software: projetos, experiência e contato.",
   },
   nav: {
     home: "Início",
@@ -152,7 +152,7 @@ const en: Dictionary = {
   meta: {
     title: "Valter da Silva | Software Developer",
     description:
-      "Portfolio of Valter da Silva, a software developer focused on backend, Java and Spring Boot. Projects, professional experience and contact.",
+      "Valter da Silva, Software Developer and Backend Developer working with Java and Spring Boot. Software Engineering student: projects, experience and contact.",
   },
   nav: {
     home: "Home",

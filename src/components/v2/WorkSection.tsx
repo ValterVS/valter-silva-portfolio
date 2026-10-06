@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useRef, type PointerEvent } from "react";
 import Image from "next/image";
-import { Reveal } from "@/components/Reveal";
+import { FadeIn } from "./FadeIn";
 import type { ImmersiveDictionary } from "@/i18n/immersive";
 import type { ImmersiveContent } from "./content";
 import { Eyebrow } from "./Eyebrow";
@@ -67,7 +67,7 @@ function ProjectPanel({ project, index, labels }: { project: Project; index: num
     >
       <div>
         <p className="font-mono text-xs tracking-[0.3em] text-gold">{String(index + 1).padStart(2, "0")}</p>
-        <h3 className="mt-4 text-[clamp(2.6rem,7.5vw,7.5rem)] leading-[0.9] font-semibold tracking-[-0.04em] break-words uppercase transition-[color,transform] duration-500 ease-out group-hover:text-gold-soft lg:translate-x-[calc(var(--mx,0)*18px)] lg:translate-y-[calc(var(--my,0)*10px)]">
+        <h3 className="mt-4 text-[clamp(2.6rem,7.5vw,7.5rem)] leading-[0.9] font-semibold tracking-[-0.04em] break-words uppercase transition-[color,transform] duration-300 ease-out group-hover:text-gold-soft lg:translate-x-[calc(var(--mx,0)*18px)] lg:translate-y-[calc(var(--my,0)*10px)]">
           {project.title}
         </h3>
         {project.image && (
@@ -87,7 +87,7 @@ function ProjectPanel({ project, index, labels }: { project: Project; index: num
         {meta && <p className="font-mono text-[11px] tracking-[0.25em] text-faint uppercase">{meta}</p>}
         <p className="max-w-md text-[17px] leading-relaxed text-pretty text-fg/80">{project.description}</p>
         {project.technologies.length > 0 && (
-          <p className="max-w-md font-mono text-[11px] leading-relaxed tracking-[0.18em] text-muted uppercase transition-colors duration-500 group-hover:text-fg/90">
+          <p className="max-w-md font-mono text-[11px] leading-relaxed tracking-[0.18em] text-muted uppercase transition-colors duration-300 group-hover:text-fg/90">
             {project.technologies.join(" / ")}
           </p>
         )}
@@ -97,30 +97,37 @@ function ProjectPanel({ project, index, labels }: { project: Project; index: num
   );
 }
 
-export function WorkSection({ ui, content }: { ui: ImmersiveDictionary; content: ImmersiveContent }) {
-  const featured = content.projects.filter((project) => project.featured);
+type WorkProps = {
+  ui: ImmersiveDictionary;
+  projects: Project[];
+  labels: ImmersiveContent["labels"];
+  repositories: string;
+};
+
+export function WorkSection({ ui, projects, labels, repositories }: WorkProps) {
+  const featured = projects.filter((project) => project.featured);
 
   return (
     <section id="work" aria-labelledby="work-title" className="relative px-5 py-28 sm:px-8 lg:px-14">
-      <Reveal>
+      <FadeIn>
         <Eyebrow index="04">{ui.work.eyebrow}</Eyebrow>
         <h2 id="work-title" className="mt-6 text-3xl font-semibold tracking-tight sm:text-4xl">
           {ui.work.title}
         </h2>
-      </Reveal>
+      </FadeIn>
 
       <div className="mt-12">
         {featured.map((project, index) => (
-          <Reveal key={project.slug}>
-            <ProjectPanel project={project} index={index} labels={content.labels} />
-          </Reveal>
+          <FadeIn key={project.slug}>
+            <ProjectPanel project={project} index={index} labels={labels} />
+          </FadeIn>
         ))}
       </div>
 
       <div className="mt-20">
         <h3 className="font-mono text-[11px] tracking-[0.3em] text-gold uppercase">{ui.work.all}</h3>
         <ul className="mt-6 border-t border-fg/10">
-          {content.projects.map((project, index) => {
+          {projects.map((project, index) => {
             const href = project.href ?? project.github;
             const meta = [project.status, project.academic, project.year].filter(Boolean).join(" · ");
             const row = (
@@ -158,7 +165,7 @@ export function WorkSection({ ui, content }: { ui: ImmersiveDictionary; content:
           })}
         </ul>
         <a
-          href={content.links.repositories}
+          href={repositories}
           target="_blank"
           rel="noreferrer"
           className="mt-10 inline-flex items-center gap-2 font-mono text-xs tracking-[0.25em] text-fg uppercase transition-colors hover:text-gold"

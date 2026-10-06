@@ -1,4 +1,4 @@
-import { Reveal } from "@/components/Reveal";
+import { FadeIn } from "./FadeIn";
 import type { ImmersiveDictionary } from "@/i18n/immersive";
 import type { ImmersiveContent } from "./content";
 import { Eyebrow } from "./Eyebrow";
@@ -6,15 +6,15 @@ import { Eyebrow } from "./Eyebrow";
 export function EducationSection({ ui, content }: { ui: ImmersiveDictionary; content: ImmersiveContent }) {
   return (
     <section id="education" aria-labelledby="education-title" className="relative px-5 py-28 sm:px-8 lg:px-14">
-      <Reveal>
+      <FadeIn>
         <Eyebrow index="05" id="education-title">
           {ui.education.eyebrow}
         </Eyebrow>
-      </Reveal>
+      </FadeIn>
 
       <div className="mt-14 grid gap-16 lg:grid-cols-2 lg:gap-24">
         {content.education.map((item) => (
-          <Reveal key={item.institution}>
+          <FadeIn key={item.institution}>
             <h3 className="text-[clamp(2rem,4.5vw,4rem)] leading-[0.95] font-semibold tracking-[-0.03em] uppercase">
               {item.course}
             </h3>
@@ -24,10 +24,10 @@ export function EducationSection({ ui, content }: { ui: ImmersiveDictionary; con
               {item.location}
               {item.conclusion && ` · ${item.conclusion}`}
             </p>
-          </Reveal>
+          </FadeIn>
         ))}
 
-        <Reveal delay={0.1}>
+        <FadeIn delay={0.1}>
           <h3 className="font-mono text-[11px] tracking-[0.3em] text-faint uppercase">{ui.education.courses}</h3>
           <ul className="mt-6 border-t border-fg/10">
             {content.courses.map((course) => (
@@ -42,7 +42,7 @@ export function EducationSection({ ui, content }: { ui: ImmersiveDictionary; con
               </li>
             ))}
           </ul>
-        </Reveal>
+        </FadeIn>
       </div>
     </section>
   );

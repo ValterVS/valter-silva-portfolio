@@ -69,7 +69,7 @@ export function V2Header({ locale, ui, resumeUrl, links }: HeaderProps) {
   return (
     <header
       className={cx(
-        "fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter] duration-500",
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter] duration-200",
         scrolled || open ? "bg-ink/75 backdrop-blur-md" : "bg-transparent",
       )}
     >

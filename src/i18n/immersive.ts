@@ -14,13 +14,13 @@ const pt = {
     language: "Idioma",
     main: "Navegação principal",
   },
-  loading: "Carregando experiência",
   resume: "Currículo",
   hero: {
     greeting: "Olá, eu sou",
     side: "Backend Developer",
     scroll: "Role para explorar",
     stackLabel: "Tecnologias principais",
+    portraitAlt: "Retrato de Valter da Silva",
   },
   about: {
     eyebrow: "Sobre mim",
@@ -75,13 +75,13 @@ const en: ImmersiveDictionary = {
     language: "Language",
     main: "Main navigation",
   },
-  loading: "Loading experience",
   resume: "Resume",
   hero: {
     greeting: "Hi, I'm",
     side: "Backend Developer",
     scroll: "Scroll to explore",
     stackLabel: "Core technologies",
+    portraitAlt: "Portrait of Valter da Silva",
   },
   about: {
     eyebrow: "About me",

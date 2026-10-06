@@ -1,6 +1,3 @@
-"use client";
-
-import { motion, type Variants } from "motion/react";
 import { ArrowRight, ArrowUpRight, Download, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
 import { localePath, type Locale } from "@/i18n/config";
@@ -20,15 +17,9 @@ type HeroProps = {
 
 const stack = ["Java", "Spring Boot", "PostgreSQL", "React"];
 
-const container: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08 } },
-};
-
-const item: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
-};
+// Entrada em CSS: o texto já vem visível no HTML, sem esperar o JavaScript.
+const enter = "animate-[fade-up_0.55s_cubic-bezier(0.22,1,0.36,1)_both]";
+const delay = (index: number) => ({ animationDelay: `${index * 80}ms` });
 
 export function Hero({ locale, dict, resumeUrl, featured }: HeroProps) {
   const home = localePath(locale);
@@ -45,35 +36,30 @@ export function Hero({ locale, dict, resumeUrl, featured }: HeroProps) {
       </div>
 
       <div className="container-page grid items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-4">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="relative z-10 min-w-0"
-        >
-          <motion.p variants={item} className="font-mono text-sm text-accent">
+        <div className="relative z-10 min-w-0">
+          <p className={`${enter} font-mono text-sm text-accent`} style={delay(0)}>
             <span className="text-faint">~/</span> {dict.hero.greeting}
-          </motion.p>
+          </p>
 
-          <motion.h1
-            variants={item}
-            className="mt-4 bg-linear-to-b from-white via-fg to-muted bg-clip-text text-[clamp(2.5rem,7.2vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.035em] text-balance text-transparent uppercase"
+          <h1
+            className={`${enter} mt-4 bg-linear-to-b from-white via-fg to-muted bg-clip-text text-[clamp(2.5rem,7.2vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.035em] text-balance text-transparent uppercase`}
+            style={delay(1)}
           >
             {profile.name}
-          </motion.h1>
+          </h1>
 
-          <motion.p variants={item} className="mt-5 flex items-baseline gap-3 text-xl font-medium text-fg sm:text-2xl">
+          <p className={`${enter} mt-5 flex items-baseline gap-3 text-xl font-medium text-fg sm:text-2xl`} style={delay(2)}>
             <span className="font-mono text-accent" aria-hidden="true">
               {"//"}
             </span>
             <RoleTicker roles={dict.hero.roles} />
-          </motion.p>
+          </p>
 
-          <motion.p variants={item} className="mt-6 max-w-xl text-base leading-relaxed text-pretty text-muted sm:text-lg">
+          <p className={`${enter} mt-6 max-w-xl text-base leading-relaxed text-pretty text-muted sm:text-lg`} style={delay(3)}>
             {profile.headline[locale]}
-          </motion.p>
+          </p>
 
-          <motion.div variants={item} className="mt-8 flex flex-wrap gap-3">
+          <div className={`${enter} mt-8 flex flex-wrap gap-3`} style={delay(4)}>
             <Link href={`${home}#projects`} className={button.primary}>
               {dict.actions.viewProjects}
               <ArrowRight size={16} aria-hidden="true" />
@@ -84,9 +70,9 @@ export function Hero({ locale, dict, resumeUrl, featured }: HeroProps) {
                 {dict.actions.downloadResume}
               </a>
             )}
-          </motion.div>
+          </div>
 
-          <motion.div variants={item} className="mt-3 flex flex-wrap gap-2">
+          <div className={`${enter} mt-3 flex flex-wrap gap-2`} style={delay(5)}>
             <a href={profile.links.github} target="_blank" rel="noreferrer" className={button.small}>
               <GithubIcon size={15} />
               GitHub
@@ -99,11 +85,11 @@ export function Hero({ locale, dict, resumeUrl, featured }: HeroProps) {
               <Mail size={15} aria-hidden="true" />
               {dict.actions.contact}
             </Link>
-          </motion.div>
+          </div>
 
-          <motion.div
-            variants={item}
-            className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs text-faint"
+          <div
+            className={`${enter} mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs text-faint`}
+            style={delay(6)}
           >
             <span className="inline-flex items-center gap-1.5">
               <MapPin size={13} aria-hidden="true" />
@@ -117,17 +103,12 @@ export function Hero({ locale, dict, resumeUrl, featured }: HeroProps) {
                 </span>
               ))}
             </span>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="relative h-[340px] min-w-0 sm:h-[440px] lg:h-[min(640px,78svh)]"
-        >
+        <div className="relative h-[340px] min-w-0 animate-[fade-in_1s_ease_0.2s_both] sm:h-[440px] lg:h-[min(640px,78svh)]">
           <HeroVisual label={dict.a11y.sceneLabel} />
-        </motion.div>
+        </div>
       </div>
 
       {featured.length > 0 && (

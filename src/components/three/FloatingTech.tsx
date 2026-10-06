@@ -70,7 +70,7 @@ export function FloatingTech({ tech, pointer, animate }: FloatingTechProps) {
       group.current.position.y = THREE.MathUtils.damp(
         group.current.position.y,
         rise - pointer.y.get() * 0.15,
-        2.5,
+        7,
         delta,
       );
     }

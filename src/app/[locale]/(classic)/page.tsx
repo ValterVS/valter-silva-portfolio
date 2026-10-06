@@ -8,7 +8,7 @@ import type { ProjectCardData } from "@/components/ProjectCard";
 import { Projects } from "@/components/Projects";
 import { Section } from "@/components/Section";
 import { SkillsGrid } from "@/components/Skills";
-import { isLocale, localePath, text, type Locale } from "@/i18n/config";
+import { htmlLang, isLocale, localePath, text, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/ui";
 import { education } from "@/data/education";
 import { profile, siteUrl } from "@/data/profile";
@@ -35,10 +35,11 @@ function projectCards(locale: Locale): ProjectCardData[] {
   }));
 }
 
-function personJsonLd(locale: Locale) {
-  return {
-    "@context": "https://schema.org",
+// Dados públicos apenas: cidade e região, nunca endereço completo.
+function siteJsonLd(locale: Locale) {
+  const person = {
     "@type": "Person",
+    "@id": `${siteUrl}/#person`,
     name: profile.name,
     alternateName: profile.brand,
     jobTitle: profile.role,
@@ -50,11 +51,22 @@ function personJsonLd(locale: Locale) {
       addressRegion: "SP",
       addressCountry: "BR",
     },
-    alumniOf: education.map((item) => ({ "@type": "CollegeOrUniversity", name: item.institution })),
-    knowsAbout: ["Java", "Spring Boot", "REST APIs", "PostgreSQL", "React", "Software Engineering"],
+    affiliation: education.map((item) => ({ "@type": "CollegeOrUniversity", name: item.institution })),
+    knowsAbout: ["Java", "Spring Boot", "REST APIs", "Backend Development", "PostgreSQL", "React", "Software Engineering"],
     sameAs: [profile.links.github, profile.links.linkedin],
     description: profile.headline[locale],
   };
+  const website = {
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    url: siteUrl,
+    name: profile.name,
+    alternateName: profile.brand,
+    description: getDictionary(locale).meta.description,
+    inLanguage: htmlLang[locale],
+    publisher: { "@id": `${siteUrl}/#person` },
+  };
+  return { "@context": "https://schema.org", "@graph": [person, website] };
 }
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -72,7 +84,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd(locale)).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd(locale)).replace(/</g, "\\u003c") }}
       />
       <Hero
         locale={locale}

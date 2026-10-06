@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useAfterLoad } from "@/lib/idle";
 import { SceneFallback } from "./SceneFallback";
 import type { Quality } from "./HeroScene";
 
@@ -52,7 +53,8 @@ export function HeroVisual({ label }: { label: string }) {
     return () => observer.disconnect();
   }, []);
 
-  const showScene = quality === "full" || quality === "lite";
+  const loaded = useAfterLoad();
+  const showScene = loaded && (quality === "full" || quality === "lite");
 
   return (
     <div ref={container} role="img" aria-label={label} className="absolute inset-0 overflow-hidden">

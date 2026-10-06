@@ -62,20 +62,22 @@ Experimental, na branch `v2-immersive`, em `/v2` (português) e `/en/v2` (inglê
 
 ```
 src/app/[locale]/v2/        rota da V2
-src/components/v2/          seções, header, cantos e loader
+src/components/v2/          casca client (ImmersivePage), seções, header e cantos
 src/components/three/       cena 3D: PortfolioScene, ValterAvatar, SceneLights, FloatingTech, SceneParticles
 src/i18n/immersive.ts       textos de interface da V2
 ```
 
-**Avatar:** tudo fica em `ValterAvatar.tsx` e os arquivos em `public/models/`. A cena usa o primeiro que existir:
+**Avatar:** tudo fica em `ValterAvatar.tsx` e os arquivos em `public/models/`. O modo é escolhido em `avatarMode` (`src/lib/model.ts`): com `"portrait"` (padrão) o GLB nunca é requisitado; com `"glb"` a cena usa o primeiro arquivo que existir:
 
-1. `valter-avatar.glb` — modelo 3D definitivo. É escalado para `AVATAR_HEIGHT`/`AVATAR_TOP`. Se tiver um clip com "idle" no nome, ele toca; morph targets com "blink" ou "smile" no nome são usados para piscar e para um sorriso leve. Sem clip, a cabeça (osso com "head" no nome) ganha só movimento procedural.
+O retrato aparece primeiro como imagem comum (`next/image`, com preload) exatamente onde o relevo 3D vai surgir. A cena 3D só é baixada depois do carregamento da página e entra por cima quando o primeiro quadro está pronto. Com movimento reduzido ou sem WebGL, fica só a imagem.
+
+1. `valter-avatar.glb` — modelo 3D definitivo (apenas com `avatarMode = "glb"`). É escalado para `AVATAR_HEIGHT`/`AVATAR_TOP`. Se tiver um clip com "idle" no nome, ele toca; morph targets com "blink" ou "smile" no nome são usados para piscar e para um sorriso leve. Sem clip, a cabeça (osso com "head" no nome) ganha só movimento procedural.
 2. `valter-portrait.webp` (ou `.jpg`/`.png`) — retrato em relevo 2.5D: a imagem ganha profundidade aproximada e reage ao cursor com giros pequenos. Se trocar a imagem, ajuste os pontos de referência em `portraitShape`.
 3. Sem nenhum dos dois, um busto abstrato.
 
 Para o GLB: busto (cabeça e ombros), virado para +Z, Y para cima, camiseta preta lisa, até ~5 MB e texturas de 1K a 2K.
 
-**Coreografia:** as posições do avatar em cada momento da página ficam em `poses` (`PortfolioScene.tsx`). As tecnologias que sobem durante o scroll ficam em `flow` (`TechFlow.tsx`), e a composição da hero em `composition` (`HeroSection.tsx`).
+**Coreografia:** as posições do avatar em cada momento da página ficam em `poses` (`PortfolioScene.tsx`). As tecnologias que sobem durante o scroll ficam em `flow` (`flow.ts`), e as palavras da hero em `stack` (`HeroSection.tsx`), com posição por breakpoint.
 
 **Promover a V2 para a raiz:** mova `src/app/[locale]/(classic)/page.tsx` para outra rota (por exemplo `(classic)/classic/page.tsx`), mova `src/app/[locale]/v2/page.tsx` para `src/app/[locale]/page.tsx` e remova o `robots: { index: false }` da metadata dela.
 

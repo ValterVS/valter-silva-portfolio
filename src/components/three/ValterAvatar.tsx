@@ -17,11 +17,14 @@ export type AvatarAssets = {
 
 type AvatarProps = {
   assets: AvatarAssets;
+  // URL efetivamente carregada pela <img> da hero, para a textura reaproveitar o cache do navegador.
+  portraitSrc: string | null;
   pointer: Pointer;
   animate: boolean;
+  onReady: () => void;
 };
 
-type PartProps = { pointer: Pointer; animate: boolean };
+type PartProps = { pointer: Pointer; animate: boolean; onReady: () => void };
 
 // Altura e topo do avatar na cena. O GLB é escalado para caber nesse espaço.
 const AVATAR_HEIGHT = 2.9;
@@ -43,25 +46,37 @@ class AvatarErrorBoundary extends Component<{ fallback: ReactNode; children: Rea
   }
 }
 
-// Ordem de preferência: modelo GLB → retrato em relevo → busto estilizado.
-export function ValterAvatar({ assets, pointer, animate }: AvatarProps) {
-  const bust = <StylizedBust pointer={pointer} animate={animate} />;
-  const portrait = assets.portrait ? (
-    <AvatarErrorBoundary fallback={bust}>
-      <Suspense fallback={bust}>
-        <PortraitRelief url={assets.portrait} pointer={pointer} animate={animate} />
+// Avisa a página no primeiro quadro desenhado, para a troca da imagem da hero pelo 3D acontecer sem flash.
+function useFirstFrame(onReady: () => void) {
+  const done = useRef(false);
+  useFrame(() => {
+    if (done.current) return;
+    done.current = true;
+    onReady();
+  });
+}
+
+// Ordem: modelo GLB → retrato em relevo → busto abstrato (só quando não há retrato).
+// Nada aparece enquanto um asset carrega: a <img> da hero continua visível até o 3D estar pronto.
+export function ValterAvatar({ assets, portraitSrc, pointer, animate, onReady }: AvatarProps) {
+  const parts = { pointer, animate, onReady };
+  const portraitUrl = portraitSrc ?? assets.portrait;
+  const portrait = portraitUrl ? (
+    <AvatarErrorBoundary fallback={null}>
+      <Suspense fallback={null}>
+        <PortraitRelief url={portraitUrl} {...parts} />
       </Suspense>
     </AvatarErrorBoundary>
   ) : (
-    bust
+    <StylizedBust {...parts} />
   );
 
   if (!assets.model) return portrait;
 
   return (
     <AvatarErrorBoundary fallback={portrait}>
-      <Suspense fallback={portrait}>
-        <ModelAvatar url={assets.model} pointer={pointer} animate={animate} />
+      <Suspense fallback={null}>
+        <ModelAvatar url={assets.model} {...parts} />
       </Suspense>
     </AvatarErrorBoundary>
   );
@@ -79,7 +94,7 @@ function applyExpression(targets: FaceTargets[], closed: number) {
   }
 }
 
-function ModelAvatar({ url, pointer, animate }: PartProps & { url: string }) {
+function ModelAvatar({ url, pointer, animate, onReady }: PartProps & { url: string }) {
   const { scene, animations } = useGLTF(url);
   const root = useRef<THREE.Group>(null);
   const head = useRef<THREE.Object3D | null>(null);
@@ -87,6 +102,7 @@ function ModelAvatar({ url, pointer, animate }: PartProps & { url: string }) {
   const blink = useRef({ start: -1, next: 2.5 });
   const { actions, names } = useAnimations(animations, root);
   const idle = names.find((name) => /idle/i.test(name));
+  useFirstFrame(onReady);
 
   const fit = useMemo(() => {
     const box = new THREE.Box3().setFromObject(scene);
@@ -231,8 +247,10 @@ function createEdgeMask() {
   return new THREE.CanvasTexture(canvas);
 }
 
-function PortraitRelief({ url, pointer, animate }: PartProps & { url: string }) {
+function PortraitRelief({ url, pointer, animate, onReady }: PartProps & { url: string }) {
   const root = useRef<THREE.Group>(null);
+  const relief = useRef<THREE.Mesh>(null);
+  const startedAt = useRef<number | null>(null);
   const texture = useTexture(url, (loaded) => {
     loaded.colorSpace = THREE.SRGBColorSpace;
     loaded.anisotropy = 4;
@@ -243,18 +261,30 @@ function PortraitRelief({ url, pointer, animate }: PartProps & { url: string }) 
   const mask = useMemo(() => createEdgeMask(), []);
   const centerY = AVATAR_TOP + portraitShape.hairTop * PORTRAIT_HEIGHT - PORTRAIT_HEIGHT / 2;
 
+  useFirstFrame(onReady);
+
   useFrame(({ clock }, delta) => {
-    if (!root.current) return;
-    const time = animate ? clock.elapsedTime : 0;
-    root.current.rotation.y = THREE.MathUtils.damp(root.current.rotation.y, pointer.x.get() * LOOK_YAW * 0.8, 3, delta);
-    root.current.rotation.x = THREE.MathUtils.damp(root.current.rotation.x, pointer.y.get() * LOOK_PITCH, 3, delta);
-    root.current.position.y = Math.sin(time * 1.1) * 0.008;
-    root.current.scale.y = 1 + Math.sin(time * 1.1) * 0.003;
+    if (!root.current || !relief.current) return;
+    startedAt.current ??= clock.elapsedTime;
+    // Começa plano, idêntico à <img> da hero, e ganha profundidade depois da troca.
+    const since = clock.elapsedTime - startedAt.current;
+    const live = animate ? THREE.MathUtils.smootherstep(since, 0.5, 1.4) : 1;
+    const time = animate ? since : 0;
+    relief.current.scale.z = Math.max(live, 0.001);
+    root.current.rotation.y = THREE.MathUtils.damp(
+      root.current.rotation.y,
+      pointer.x.get() * LOOK_YAW * 0.8 * live,
+      3,
+      delta,
+    );
+    root.current.rotation.x = THREE.MathUtils.damp(root.current.rotation.x, pointer.y.get() * LOOK_PITCH * live, 3, delta);
+    root.current.position.y = Math.sin(time * 1.1) * 0.008 * live;
+    root.current.scale.y = 1 + Math.sin(time * 1.1) * 0.003 * live;
   });
 
   return (
     <group ref={root}>
-      <mesh geometry={geometry} position={[0, centerY, 0]}>
+      <mesh ref={relief} geometry={geometry} position={[0, centerY, 0]}>
         <meshBasicMaterial map={texture} alphaMap={mask} transparent toneMapped={false} />
       </mesh>
     </group>
@@ -293,8 +323,9 @@ function createHead() {
   return geometry;
 }
 
-function StylizedBust({ pointer, animate }: PartProps) {
+function StylizedBust({ pointer, animate, onReady }: PartProps) {
   const body = useRef<THREE.Group>(null);
+  useFirstFrame(onReady);
   const torso = useRef<THREE.Group>(null);
   const headGroup = useRef<THREE.Group>(null);
 

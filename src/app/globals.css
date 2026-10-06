@@ -151,9 +151,34 @@
   }
 }
 
-@keyframes loader-out {
-  to {
+@keyframes rise-in {
+  from {
     opacity: 0;
-    visibility: hidden;
+    transform: translateY(40%);
   }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Mesmo recorte de bordas aplicado à textura do relevo 3D, para a troca imagem → 3D não aparecer. */
+.portrait-mask {
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 6%, black 20%, black 80%, transparent 94%),
+    linear-gradient(to bottom, transparent 2%, black 8%, black 80%, transparent 98%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 6%, black 20%, black 80%, transparent 94%),
+    linear-gradient(to bottom, transparent 2%, black 8%, black 80%, transparent 98%);
+  mask-composite: intersect;
 }

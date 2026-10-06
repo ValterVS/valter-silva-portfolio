@@ -7,9 +7,10 @@ import type { ReactNode } from "react";
 import { GithubIcon } from "@/components/icons";
 import { ProjectBadges } from "@/components/ProjectCard";
 import { Reveal } from "@/components/Reveal";
-import { isLocale, localePath, ogLocale, text } from "@/i18n/config";
+import { htmlLang, isLocale, localePath, ogLocale, text, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/ui";
-import { getProject, projects } from "@/data/projects";
+import { profile, siteUrl } from "@/data/profile";
+import { getProject, projects, type Project } from "@/data/projects";
 import { button, chip, cx } from "@/lib/styles";
 
 type PageProps = { params: Promise<{ locale: string; slug: string }> };
@@ -33,6 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = text(project.title, locale);
   const description = project.description[locale];
   const path = `/projects/${project.slug}`;
+  const image = project.image ? { url: project.image, alt: title } : { url: `/og/${locale}`, width: 1200, height: 630, alt: title };
 
   return {
     title,
@@ -47,8 +49,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       locale: ogLocale[locale],
-      images: [{ url: project.image ?? `/og/${locale}`, width: 1200, height: 630, alt: title }],
+      images: [image],
     },
+    twitter: { card: "summary_large_image", title, description, images: [image.url] },
+  };
+}
+
+// Código aberto vira SoftwareSourceCode; sem repositório público, o projeto é descrito como CreativeWork.
+function projectJsonLd(project: Project, locale: Locale) {
+  return {
+    "@context": "https://schema.org",
+    "@type": project.github ? "SoftwareSourceCode" : "CreativeWork",
+    name: text(project.title, locale),
+    description: project.description[locale],
+    url: `${siteUrl}${localePath(locale, `/projects/${project.slug}`)}`,
+    inLanguage: htmlLang[locale],
+    keywords: project.technologies.join(", "),
+    author: { "@type": "Person", name: profile.name, url: siteUrl },
+    ...(project.github && { codeRepository: project.github }),
+    ...(project.live && { sameAs: project.live }),
+    ...(project.year && { dateCreated: project.year }),
+    ...(project.image && { image: `${siteUrl}${project.image}` }),
   };
 }
 
@@ -84,6 +105,10 @@ export default async function ProjectPage({ params }: PageProps) {
 
   return (
     <article className="relative pt-28 pb-24 sm:pt-32">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd(project, locale)).replace(/</g, "\\u003c") }}
+      />
       <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[520px] overflow-hidden">
         <div className="bg-grid absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <div className="absolute -top-40 left-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-accent/10 blur-[130px]" />
