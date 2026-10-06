@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Paleta do site */
+@theme {
+  --color-bg: #06080c;
+  --color-surface: #0b0f15;
+  --color-surface-2: #111720;
+  --color-line: rgb(148 163 184 / 0.12);
+  --color-line-strong: rgb(148 163 184 / 0.22);
+  --color-fg: #e7edf4;
+  --color-muted: #94a0b2;
+  --color-faint: #748094;
+  --color-accent: #38bdf8;
+  --color-accent-soft: #7dd3fc;
+  --color-accent-2: #22d3ee;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: rgb(56 189 248 / 0.3);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(148 163 184 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(148 163 184 / 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .card {
+    border: 1px solid var(--color-line);
+    background: linear-gradient(180deg, rgb(17 23 32 / 0.72), rgb(11 15 21 / 0.72));
+    border-radius: 1rem;
+  }
+
+  /* Última linha incompleta da grade ocupa o espaço restante */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .grid-fill > :last-child:nth-child(2n + 1) {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .grid-fill > :last-child:nth-child(3n + 1) {
+      grid-column: span 3;
+    }
+
+    .grid-fill > :last-child:nth-child(3n + 2) {
+      grid-column: span 2;
+    }
+  }
+}
