@@ -106,7 +106,7 @@ export function ImmersivePage({ locale, ui, avatar, resumeUrl, links, hero: hero
       </motion.div>
 
       <HeroStack progress={hero} />
-      {!reduced && <TechLayer depth="back" progress={tech} items={flow} />}
+      {!reduced && <TechLayer depth="back" progress={tech} fade={leaving} items={flow} />}
 
       <motion.div className="pointer-events-none fixed inset-0 z-10" style={{ opacity: stageOpacity }}>
         {poster && (
@@ -147,7 +147,7 @@ export function ImmersivePage({ locale, ui, avatar, resumeUrl, links, hero: hero
         )}
       </motion.div>
 
-      {!reduced && <TechLayer depth="front" progress={tech} items={flow} />}
+      {!reduced && <TechLayer depth="front" progress={tech} fade={leaving} items={flow} />}
 
       <V2Header locale={locale} ui={ui} resumeUrl={resumeUrl} links={links} />
       <Corners ui={ui} resumeUrl={resumeUrl} links={links} />

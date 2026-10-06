@@ -10,59 +10,77 @@ export type HeroContent = { name: string; role: string; headline: string };
 // para não competir com o nome. O x parte do centro da tela em vh, porque a largura do avatar
 // acompanha a altura da tela; assim a distância até ele é a mesma em 1366, 1440 ou 1920 px.
 // lg = 1024+ (avatar um pouco menor), xl = 1280+.
+// exit: como cada palavra sai durante o scroll da hero; fade = início e fim do fade, em progresso da hero.
 const stack = [
   {
     word: "Java",
     className: "text-[clamp(3.5rem,6vw,7.5rem)] font-semibold text-gold",
     position: "lg:left-[calc(50%+18vh)] lg:top-[24%] xl:left-[calc(50%+22vh)] xl:top-[22%]",
+    exit: { x: "2vw", y: "-24vh", scale: 1, fade: [0.3, 0.75] },
   },
   {
     word: "Spring",
     className: "text-[clamp(2.25rem,3.8vw,4.75rem)] font-medium text-outline text-fg/60",
     position: "lg:left-[calc(50%+28vh)] lg:top-[36%] xl:left-[calc(50%+33vh)] xl:top-[34%]",
+    exit: { x: "16vw", y: "-4vh", scale: 1, fade: [0.35, 0.8] },
   },
   {
     word: "API",
     className: "text-[clamp(1.6rem,2.6vw,3.25rem)] font-medium text-fg/80",
     position: "lg:left-[calc(50%+22vh)] lg:top-[47%] xl:left-[calc(50%+25vh)] xl:top-[45%]",
+    exit: { x: "3vw", y: "-6vh", scale: 0.7, fade: [0.25, 0.7] },
   },
   {
     word: "SQL",
     className: "text-[clamp(3rem,5.2vw,6.5rem)] font-semibold text-outline text-gold/80",
     position: "lg:left-[calc(50%+35vh)] lg:top-[49%] xl:left-[calc(50%+44vh)] xl:top-[48%]",
+    exit: { x: "6vw", y: "12vh", scale: 1, fade: [0.4, 0.85] },
   },
   {
     word: "Docker",
     className: "font-mono text-[clamp(0.7rem,1vw,1.25rem)] tracking-[0.45em] text-faint",
     position: "lg:left-[calc(50%+23vh)] lg:top-[63%] xl:left-[calc(50%+28vh)] xl:top-[62%]",
+    exit: { x: "2vw", y: "-3vh", scale: 1, fade: [0.2, 0.6] },
   },
 ];
 
-function StackWord({ item, index, progress }: { item: (typeof stack)[number]; index: number; progress: MotionValue<number> }) {
-  // Ao rolar, as palavras sobem e saem pela direita, sempre longe do nome.
-  const x = useTransform(progress, [0, 1], ["0vw", `${6 + index * 3}vw`]);
-  const y = useTransform(progress, [0, 1], ["0vh", `${-8 - index * 2}vh`]);
-  const opacity = useTransform(progress, [0, 0.55], [1, 0]);
+// As faixas sempre cobrem de 0 a 1. O Motion acelera essas animações com ViewTimeline nativo, e uma
+// faixa parcial (ex.: [0, 0.55]) deixa o fim sem keyframe: o navegador volta ao valor original
+// (opacity 1) e a palavra reaparece depois da hero.
+function StackWord({ item, progress }: { item: (typeof stack)[number]; progress: MotionValue<number> }) {
+  const [fadeStart, fadeEnd] = item.exit.fade;
+  const x = useTransform(progress, [0, fadeEnd, 1], ["0vw", item.exit.x, item.exit.x]);
+  const y = useTransform(progress, [0, fadeEnd, 1], ["0vh", item.exit.y, item.exit.y]);
+  const scale = useTransform(progress, [0, fadeEnd, 1], [1, item.exit.scale, item.exit.scale]);
+  const opacity = useTransform(progress, [0, fadeStart, fadeEnd, 1], [1, 1, 0, 0]);
   return (
     <motion.span
-      style={{ x, y, opacity }}
-      className={cx("absolute leading-[0.95] tracking-[-0.02em] whitespace-nowrap uppercase", item.position, item.className)}
+      style={{ x, y, scale, opacity }}
+      className={cx(
+        "absolute origin-left leading-[0.95] tracking-[-0.02em] whitespace-nowrap uppercase",
+        item.position,
+        item.className,
+      )}
     >
       {item.word}
     </motion.span>
   );
 }
 
-// Camada intermediária: fica atrás do avatar (z-5) e à frente do fundo.
+// Camada intermediária (fundo → palavras → avatar → texto da hero). Não é fixa na página: fica presa
+// num trecho com a mesma altura da hero (150svh) e sai junto com ela, então nunca chega às outras seções.
 export function HeroStack({ progress }: { progress: MotionValue<number> }) {
+  const visibility = useTransform(progress, (value) => (value > 0.97 ? "hidden" : "visible"));
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[5] hidden animate-[fade-in_1s_ease_0.5s_both] overflow-hidden lg:block"
-    >
-      {stack.map((item, index) => (
-        <StackWord key={item.word} item={item} index={index} progress={progress} />
-      ))}
+    <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-[5] hidden h-[150svh] lg:block">
+      <motion.div
+        style={{ visibility }}
+        className="sticky top-0 h-svh animate-[fade-in_1s_ease_0.5s_both] overflow-hidden"
+      >
+        {stack.map((item) => (
+          <StackWord key={item.word} item={item} progress={progress} />
+        ))}
+      </motion.div>
     </div>
   );
 }
@@ -76,9 +94,9 @@ type HeroProps = {
 export function HeroSection({ progress, ui, content }: HeroProps) {
   const [first, ...rest] = content.name.split(" ");
   const nameY = useTransform(progress, [0, 1], ["0vh", "-18vh"]);
-  const nameOpacity = useTransform(progress, [0.05, 0.6], [1, 0]);
+  const nameOpacity = useTransform(progress, [0, 0.05, 0.6, 1], [1, 1, 0, 0]);
   const nameScale = useTransform(progress, [0, 1], [1, 0.92]);
-  const cueOpacity = useTransform(progress, [0, 0.12], [1, 0]);
+  const cueOpacity = useTransform(progress, [0, 0.12, 1], [1, 0, 0]);
   const words = stack.map((item) => item.word);
 
   return (

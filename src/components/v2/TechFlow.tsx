@@ -17,8 +17,11 @@ function RisingWord({
   progress: MotionValue<number>;
 }) {
   const start = 0.04 + index * STEP;
-  const y = useTransform(progress, [start, start + WINDOW], ["70vh", "-70vh"]);
-  const opacity = useTransform(progress, [start, start + 0.07, start + WINDOW - 0.1, start + WINDOW - 0.04], [0, 1, 1, 0]);
+  const end = start + WINDOW;
+  // Faixas sempre de 0 a 1: com uma faixa parcial, a animação nativa (ViewTimeline) volta para
+  // opacity 1 fora da janela e a palavra aparece no meio da tela antes e depois da sua vez.
+  const y = useTransform(progress, [0, start, end, 1], ["70vh", "70vh", "-70vh", "-70vh"]);
+  const opacity = useTransform(progress, [0, start, start + 0.07, end - 0.1, end - 0.04, 1], [0, 0, 1, 1, 0, 0]);
   const front = item.depth === "front";
   const position = item.side === "left" ? { left: `${item.offset}%` } : { right: `${item.offset}%` };
 
@@ -44,18 +47,24 @@ function RisingWord({
   );
 }
 
+// fade: some com a camada inteira quando a lista de tecnologias entra, para nada passar por cima dela.
 export function TechLayer({
   depth,
   progress,
+  fade,
   items,
 }: {
   depth: FlowItem["depth"];
   progress: MotionValue<number>;
+  fade: MotionValue<number>;
   items: FlowItem[];
 }) {
+  const opacity = useTransform(fade, [0, 0.5, 1], [1, 0, 0]);
+  const visibility = useTransform(progress, (value) => (value <= 0 || value >= 1 ? "hidden" : "visible"));
   return (
-    <div
+    <motion.div
       aria-hidden="true"
+      style={{ opacity, visibility }}
       className={cx(
         "pointer-events-none fixed inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_85%,transparent)]",
         depth === "back" ? "z-[5]" : "z-20",
@@ -64,6 +73,6 @@ export function TechLayer({
       {items.map((item, index) =>
         item.depth === depth ? <RisingWord key={item.name} item={item} index={index} progress={progress} /> : null,
       )}
-    </div>
+    </motion.div>
   );
 }
