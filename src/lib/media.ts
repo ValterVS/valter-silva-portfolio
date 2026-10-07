@@ -4,13 +4,21 @@ export type Quality = "full" | "lite" | "none";
 
 let detected: Quality | undefined;
 
-// Nível de detalhe do 3D, decidido uma vez: sem WebGL → nada, tela pequena ou aparelho modesto → leve.
+// WebGL desenhado pela CPU (sem GPU, ou GPU bloqueada pelo navegador). Nesses casos a cena derruba
+// a página inteira para poucos quadros por segundo, então fica só a imagem estática.
+const softwareRenderer = /swiftshader|llvmpipe|softpipe|software|basic render/i;
+
+// Nível de detalhe do 3D, decidido uma vez: sem WebGL acelerado → nada, tela pequena ou aparelho modesto → leve.
 function detectQuality(): Quality {
   if (detected) return detected;
   const canvas = document.createElement("canvas");
-  const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+  const options: WebGLContextAttributes = { failIfMajorPerformanceCaveat: true };
+  const gl = canvas.getContext("webgl2", options) ?? canvas.getContext("webgl", options);
   if (!gl) return (detected = "none");
+  const info = gl.getExtension("WEBGL_debug_renderer_info");
+  const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
   gl.getExtension("WEBGL_lose_context")?.loseContext();
+  if (softwareRenderer.test(renderer)) return (detected = "none");
 
   const nav = navigator as Navigator & { deviceMemory?: number };
   const modest = (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4;

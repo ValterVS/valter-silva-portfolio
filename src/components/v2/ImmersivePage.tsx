@@ -47,7 +47,6 @@ export function ImmersivePage({ locale, ui, avatar, resumeUrl, links, hero: hero
   const reduced = useReducedMotion();
   const compact = useCompact();
   const finePointer = useFinePointer();
-  const loaded = useAfterLoad();
   const [ready, setReady] = useState(false);
   const [stageActive, setStageActive] = useState(true);
   const [portraitSrc, setPortraitSrc] = useState<string | null>(null);
@@ -80,6 +79,9 @@ export function ImmersivePage({ locale, ui, avatar, resumeUrl, links, hero: hero
 
   const poster = !avatar.model && avatar.portrait ? avatar.portrait : null;
   const canAnimate = (quality === "full" || quality === "lite") && !reduced;
+  // Desktop: 3D quando o navegador fica ocioso após o load. Celular/aparelho modesto: só no primeiro
+  // toque ou scroll (ou alguns segundos depois), para a rede e a CPU ficarem livres para o conteúdo.
+  const loaded = useAfterLoad(!canAnimate ? null : quality === "lite" ? "interaction" : "idle");
   const showScene = canAnimate && loaded && (!poster || portraitSrc !== null);
   const live = showScene && ready;
 

@@ -1,7 +1,5 @@
-"use client";
-
-import { ArrowUpRight, Check, Copy } from "lucide-react";
-import { useState } from "react";
+import { ArrowUpRight } from "lucide-react";
+import { CopyEmail } from "./CopyEmail";
 import { FadeIn } from "./FadeIn";
 import type { ImmersiveDictionary } from "@/i18n/immersive";
 import type { ImmersiveContent } from "./content";
@@ -15,18 +13,6 @@ type ContactProps = {
 };
 
 export function ContactSection({ ui, email, links: profileLinks, resumeUrl }: ContactProps) {
-  const [copied, setCopied] = useState(false);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      window.location.href = `mailto:${email}`;
-    }
-  }
-
   const links = [
     { label: "LinkedIn", href: profileLinks.linkedin, external: true },
     { label: "GitHub", href: profileLinks.github, external: true },
@@ -59,15 +45,7 @@ export function ContactSection({ ui, email, links: profileLinks, resumeUrl }: Co
             >
               {email}
             </a>
-            <button
-              type="button"
-              onClick={copy}
-              aria-live="polite"
-              className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.25em] text-muted uppercase transition-colors hover:text-fg"
-            >
-              {copied ? <Check size={13} aria-hidden="true" /> : <Copy size={13} aria-hidden="true" />}
-              {copied ? ui.contact.copied : ui.contact.copy}
-            </button>
+            <CopyEmail email={email} label={ui.contact.copy} done={ui.contact.copied} />
           </div>
           <ul className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
             {links.map((link) => (

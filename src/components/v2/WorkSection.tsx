@@ -1,13 +1,11 @@
-"use client";
-
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { useRef, type PointerEvent } from "react";
 import Image from "next/image";
 import { FadeIn } from "./FadeIn";
 import type { ImmersiveDictionary } from "@/i18n/immersive";
 import type { ImmersiveContent } from "./content";
 import { Eyebrow } from "./Eyebrow";
+import { TiltPanel } from "./TiltPanel";
 
 type Project = ImmersiveContent["projects"][number];
 
@@ -40,29 +38,10 @@ function ProjectLinks({ project, labels }: { project: Project; labels: Immersive
 }
 
 function ProjectPanel({ project, index, labels }: { project: Project; index: number; labels: ImmersiveContent["labels"] }) {
-  const panel = useRef<HTMLElement>(null);
-
-  // O título acompanha levemente o cursor dentro do painel.
-  function track(event: PointerEvent<HTMLElement>) {
-    const element = panel.current;
-    if (!element || event.pointerType !== "mouse") return;
-    const rect = element.getBoundingClientRect();
-    element.style.setProperty("--mx", String((event.clientX - rect.left) / rect.width - 0.5));
-    element.style.setProperty("--my", String((event.clientY - rect.top) / rect.height - 0.5));
-  }
-
-  function reset() {
-    panel.current?.style.setProperty("--mx", "0");
-    panel.current?.style.setProperty("--my", "0");
-  }
-
   const meta = [project.status, project.academic, project.year].filter(Boolean).join(" · ");
 
   return (
-    <article
-      ref={panel}
-      onPointerMove={track}
-      onPointerLeave={reset}
+    <TiltPanel
       className="group relative grid gap-10 border-t border-fg/10 py-16 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-16 lg:py-24"
     >
       <div>
@@ -93,7 +72,7 @@ function ProjectPanel({ project, index, labels }: { project: Project; index: num
         )}
         <ProjectLinks project={project} labels={labels} />
       </div>
-    </article>
+    </TiltPanel>
   );
 }
 
