@@ -3,6 +3,7 @@ import Link from "next/link";
 import { localePath, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/ui";
 import { profile } from "@/data/profile";
+import { legacyPath } from "@/lib/routes";
 import { button } from "@/lib/styles";
 import { GithubIcon, LinkedinIcon } from "./icons";
 import { RoleTicker } from "./RoleTicker";
@@ -22,7 +23,7 @@ const enter = "animate-[fade-up_0.55s_cubic-bezier(0.22,1,0.36,1)_both]";
 const delay = (index: number) => ({ animationDelay: `${index * 80}ms` });
 
 export function Hero({ locale, dict, resumeUrl, featured }: HeroProps) {
-  const home = localePath(locale);
+  const home = localePath(locale, legacyPath);
 
   return (
     <section

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { About } from "@/components/About";
 import { Contact } from "@/components/Contact";
@@ -8,12 +9,11 @@ import type { ProjectCardData } from "@/components/ProjectCard";
 import { Projects } from "@/components/Projects";
 import { Section } from "@/components/Section";
 import { SkillsGrid } from "@/components/Skills";
-import { htmlLang, isLocale, localePath, text, type Locale } from "@/i18n/config";
+import { isLocale, localePath, text, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/ui";
-import { education } from "@/data/education";
-import { profile, siteUrl } from "@/data/profile";
 import { projects } from "@/data/projects";
 import { getResumeUrl } from "@/lib/resume";
+import { legacyPath } from "@/lib/routes";
 
 // Projetos exibidos discretamente no rodapé da hero
 const heroProjects = ["eitanol", "orca-ai", "jurimetria-ia"];
@@ -35,41 +35,22 @@ function projectCards(locale: Locale): ProjectCardData[] {
   }));
 }
 
-// Dados públicos apenas: cidade e região, nunca endereço completo.
-function siteJsonLd(locale: Locale) {
-  const person = {
-    "@type": "Person",
-    "@id": `${siteUrl}/#person`,
-    name: profile.name,
-    alternateName: profile.brand,
-    jobTitle: profile.role,
-    url: siteUrl,
-    email: `mailto:${profile.email}`,
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Lins",
-      addressRegion: "SP",
-      addressCountry: "BR",
+type PageProps = { params: Promise<{ locale: string }> };
+
+// A V1 continua acessível, mas fora dos buscadores: o conteúdo é o mesmo da home principal.
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  return {
+    alternates: {
+      canonical: localePath(locale, legacyPath),
+      languages: { "pt-BR": legacyPath, en: localePath("en", legacyPath) },
     },
-    affiliation: education.map((item) => ({ "@type": "CollegeOrUniversity", name: item.institution })),
-    knowsAbout: ["Java", "Spring Boot", "REST APIs", "Backend Development", "PostgreSQL", "React", "Software Engineering"],
-    sameAs: [profile.links.github, profile.links.linkedin],
-    description: profile.headline[locale],
+    robots: { index: false, follow: true },
   };
-  const website = {
-    "@type": "WebSite",
-    "@id": `${siteUrl}/#website`,
-    url: siteUrl,
-    name: profile.name,
-    alternateName: profile.brand,
-    description: getDictionary(locale).meta.description,
-    inLanguage: htmlLang[locale],
-    publisher: { "@id": `${siteUrl}/#person` },
-  };
-  return { "@context": "https://schema.org", "@graph": [person, website] };
 }
 
-export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function LegacyHomePage({ params }: PageProps) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
@@ -78,14 +59,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const featured = heroProjects
     .map((slug) => cards.find((card) => card.slug === slug))
     .filter((card): card is ProjectCardData => Boolean(card))
-    .map((card) => ({ slug: card.slug, title: card.title, href: card.href ?? `${localePath(locale)}#projects` }));
+    .map((card) => ({ slug: card.slug, title: card.title, href: card.href ?? `${localePath(locale, legacyPath)}#projects` }));
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd(locale)).replace(/</g, "\\u003c") }}
-      />
       <Hero
         locale={locale}
         dict={{ hero: dict.hero, actions: dict.actions, a11y: dict.a11y }}

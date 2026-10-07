@@ -1,6 +1,6 @@
 import { ArrowUp, Mail } from "lucide-react";
 import Link from "next/link";
-import { localePath, type Locale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/ui";
 import { profile } from "@/data/profile";
 import { button } from "@/lib/styles";
@@ -8,7 +8,8 @@ import { GithubIcon, LinkedinIcon } from "./icons";
 
 const year = new Date().getFullYear();
 
-export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+// top: link do botão de voltar ao topo (home + âncora da hero).
+export function Footer({ locale, dict, top }: { locale: Locale; dict: Dictionary; top: string }) {
   return (
     <footer className="border-t border-line">
       <div className="container-page flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
@@ -31,7 +32,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <a href={`mailto:${profile.email}`} aria-label={profile.email} className={button.icon}>
             <Mail size={16} aria-hidden="true" />
           </a>
-          <Link href={`${localePath(locale)}#home`} aria-label={dict.a11y.backToTop} className={button.icon}>
+          <Link href={top} aria-label={dict.a11y.backToTop} className={button.icon}>
             <ArrowUp size={16} aria-hidden="true" />
           </Link>
         </div>

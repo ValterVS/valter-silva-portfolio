@@ -4,14 +4,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { FileText, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { localePath, type Locale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/ui";
 import { profile } from "@/data/profile";
+import { siteSections as sections, type SiteSection } from "@/lib/routes";
 import { button, cx } from "@/lib/styles";
 import { GithubIcon, LinkedinIcon } from "./icons";
 import { LanguageSwitch } from "./LanguageSwitch";
-
-const sections = ["home", "about", "experience", "skills", "projects", "education", "contact"] as const;
 
 function subscribeToScroll(callback: () => void) {
   window.addEventListener("scroll", callback, { passive: true });
@@ -22,13 +21,16 @@ type HeaderProps = {
   locale: Locale;
   dict: Pick<Dictionary, "nav" | "actions" | "a11y">;
   resumeUrl: string | null;
+  // Página onde ficam as seções e, se os ids forem outros, a âncora de cada uma.
+  home: string;
+  anchors?: Record<SiteSection, string>;
 };
 
-export function Header({ locale, dict, resumeUrl }: HeaderProps) {
+export function Header({ locale, dict, resumeUrl, home, anchors }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const scrolled = useSyncExternalStore(subscribeToScroll, () => window.scrollY > 12, () => false);
-  const home = localePath(locale);
+  const sectionHref = (id: SiteSection) => `${home}#${anchors?.[id] ?? id}`;
 
   useEffect(() => {
     const elements = sections
@@ -77,7 +79,7 @@ export function Header({ locale, dict, resumeUrl }: HeaderProps) {
             {sections.map((id) => (
               <li key={id}>
                 <Link
-                  href={`${home}#${id}`}
+                  href={sectionHref(id)}
                   aria-current={active === id ? "location" : undefined}
                   className={cx(
                     "relative rounded-full px-3 py-2 text-[13px] transition-colors",
@@ -153,7 +155,7 @@ export function Header({ locale, dict, resumeUrl }: HeaderProps) {
                 {sections.map((id) => (
                   <li key={id}>
                     <Link
-                      href={`${home}#${id}`}
+                      href={sectionHref(id)}
                       onClick={() => setOpen(false)}
                       className="block rounded-lg px-3 py-2.5 text-[15px] text-muted transition-colors hover:bg-surface-2 hover:text-fg"
                     >

@@ -5,9 +5,9 @@ import { Header } from "@/components/Header";
 import { isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/ui";
 import { getResumeUrl } from "@/lib/resume";
-import { mainAnchors } from "@/lib/routes";
+import { legacyPath } from "@/lib/routes";
 
-export default async function ProjectsLayout({
+export default async function LegacyLayout({
   children,
   params,
 }: {
@@ -17,9 +17,9 @@ export default async function ProjectsLayout({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const dict = getDictionary(locale);
-  const home = localePath(locale);
+  const home = localePath(locale, legacyPath);
 
-  // Páginas de projeto (e 404): mantêm o header da V1, mas a navegação leva às seções da home atual.
+  // V1 completa em /v1, com a navegação apontando para as próprias seções.
   return (
     <>
       <Header
@@ -27,10 +27,9 @@ export default async function ProjectsLayout({
         dict={{ nav: dict.nav, actions: dict.actions, a11y: dict.a11y }}
         resumeUrl={getResumeUrl(locale)}
         home={home}
-        anchors={mainAnchors}
       />
       <main id="content">{children}</main>
-      <Footer locale={locale} dict={dict} top={`${home}#${mainAnchors.home}`} />
+      <Footer locale={locale} dict={dict} top={`${home}#home`} />
     </>
   );
 }

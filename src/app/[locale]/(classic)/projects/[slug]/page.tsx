@@ -11,6 +11,8 @@ import { htmlLang, isLocale, localePath, ogLocale, text, type Locale } from "@/i
 import { getDictionary } from "@/i18n/ui";
 import { profile, siteUrl } from "@/data/profile";
 import { getProject, projects, type Project } from "@/data/projects";
+import { jsonLdScript } from "@/lib/jsonld";
+import { mainAnchors } from "@/lib/routes";
 import { button, chip, cx } from "@/lib/styles";
 
 type PageProps = { params: Promise<{ locale: string; slug: string }> };
@@ -107,7 +109,7 @@ export default async function ProjectPage({ params }: PageProps) {
     <article className="relative pt-28 pb-24 sm:pt-32">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd(project, locale)).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={jsonLdScript(projectJsonLd(project, locale))}
       />
       <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[520px] overflow-hidden">
         <div className="bg-grid absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
@@ -116,7 +118,7 @@ export default async function ProjectPage({ params }: PageProps) {
 
       <div className="container-page">
         <Link
-          href={`${localePath(locale)}#projects`}
+          href={`${localePath(locale)}#${mainAnchors.projects}`}
           className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-fg"
         >
           <ArrowLeft size={16} aria-hidden="true" />

@@ -21,7 +21,7 @@ Outros comandos: `npm run lint`, `npm run typecheck`, `npm run build` e `npm sta
 
 ```
 src/
-  app/[locale]/        páginas (home e /projects/[slug]), layout e metadata
+  app/[locale]/        home (page.tsx), V1 em (legacy)/v1, projetos em (classic)/projects/[slug], layout e metadata
   app/og/              imagem de compartilhamento gerada no build
   components/          seções do site
   components/scene/    cena 3D da hero e versão em SVG
@@ -56,12 +56,13 @@ Todo texto que aparece no site está em `src/data` ou em `src/i18n/ui.ts`. Campo
 
 **Novo idioma:** inclua o código em `locales` (`src/i18n/config.ts`). O TypeScript passa a apontar todos os textos que precisam da nova tradução.
 
-## Versão imersiva (V2)
+## Home (V2) e versão clássica (V1)
 
-Experimental, na branch `v2-immersive`, em `/v2` (português) e `/en/v2` (inglês). Usa os mesmos dados de `src/data`; só a apresentação muda. Fica fora dos buscadores (`noindex`) enquanto for experimental.
+A home (`/` e `/en`) é a versão imersiva. A versão anterior continua em `/v1` e `/en/v1`, com a própria navegação, mas fora dos buscadores (`noindex`) para não duplicar conteúdo. As páginas `/projects/<slug>` usam o header da V1 com links para as seções da home. Os endereços antigos `/v2` e `/en/v2` redirecionam permanentemente (308) para a home. O caminho da V1 fica em `legacyPath` (`src/lib/routes.ts`).
 
 ```
-src/app/[locale]/v2/        rota da V2
+src/app/[locale]/page.tsx   home (V2)
+src/app/[locale]/(legacy)/  V1 em /v1
 src/components/v2/          casca client (ImmersivePage), seções, header e cantos
 src/components/three/       cena 3D: PortfolioScene, ValterAvatar, SceneLights, FloatingTech, SceneParticles
 src/i18n/immersive.ts       textos de interface da V2
@@ -78,8 +79,6 @@ O retrato aparece primeiro como imagem comum (`next/image`, com preload) exatame
 Para o GLB: busto (cabeça e ombros), virado para +Z, Y para cima, camiseta preta lisa, até ~5 MB e texturas de 1K a 2K.
 
 **Coreografia:** as posições do avatar em cada momento da página ficam em `poses` (`PortfolioScene.tsx`). As tecnologias que sobem durante o scroll ficam em `flow` (`flow.ts`), e as palavras da hero em `stack` (`HeroSection.tsx`), com posição por breakpoint.
-
-**Promover a V2 para a raiz:** mova `src/app/[locale]/(classic)/page.tsx` para outra rota (por exemplo `(classic)/classic/page.tsx`), mova `src/app/[locale]/v2/page.tsx` para `src/app/[locale]/page.tsx` e remova o `robots: { index: false }` da metadata dela.
 
 ## Currículo
 

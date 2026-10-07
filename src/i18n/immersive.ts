@@ -1,6 +1,6 @@
 import type { Locale } from "./config";
 
-// Textos de interface da versão imersiva (/v2). O conteúdo profissional continua em src/data.
+// Textos de interface da home (versão imersiva). O conteúdo profissional continua em src/data.
 const pt = {
   meta: {
     title: "Valter da Silva | Software Developer",
