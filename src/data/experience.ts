@@ -75,6 +75,6 @@ export const experience: Experience[] = [
         "Built React interfaces backed by SQL Server.",
       ],
     },
-    tags: ["React", "JavaScript", "SQL Server", "n8n"],
+    tags: ["Java","Spring","NodeJS", "Typescript", "SQL Server", "n8n"],
   },
 ];
