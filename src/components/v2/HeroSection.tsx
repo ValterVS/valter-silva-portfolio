@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowDown, FileText } from "lucide-react";
 import { motion, useTransform, type MotionValue } from "motion/react";
 import type { ImmersiveDictionary } from "@/i18n/immersive";
 import { cx } from "@/lib/styles";
@@ -15,31 +16,31 @@ const stack = [
   {
     word: "Java",
     className: "text-[clamp(3.5rem,6vw,7.5rem)] font-semibold text-gold",
-    position: "lg:left-[calc(50%+18vh)] lg:top-[24%] xl:left-[calc(50%+22vh)] xl:top-[22%]",
+    position: "lg:left-[calc(58%+18vh)] lg:top-[24%] xl:left-[calc(50%+22vh)] xl:top-[22%]",
     exit: { x: "2vw", y: "-24vh", scale: 1, fade: [0.3, 0.75] },
   },
   {
     word: "Spring",
     className: "text-[clamp(2.25rem,3.8vw,4.75rem)] font-medium text-outline text-fg/60",
-    position: "lg:left-[calc(50%+28vh)] lg:top-[36%] xl:left-[calc(50%+33vh)] xl:top-[34%]",
+    position: "lg:left-[calc(58%+26vh)] lg:top-[36%] xl:left-[calc(50%+33vh)] xl:top-[34%]",
     exit: { x: "16vw", y: "-4vh", scale: 1, fade: [0.35, 0.8] },
   },
   {
     word: "API",
     className: "text-[clamp(1.6rem,2.6vw,3.25rem)] font-medium text-fg/80",
-    position: "lg:left-[calc(50%+22vh)] lg:top-[47%] xl:left-[calc(50%+25vh)] xl:top-[45%]",
+    position: "lg:left-[calc(58%+22vh)] lg:top-[47%] xl:left-[calc(50%+25vh)] xl:top-[45%]",
     exit: { x: "3vw", y: "-6vh", scale: 0.7, fade: [0.25, 0.7] },
   },
   {
     word: "SQL",
     className: "text-[clamp(3rem,5.2vw,6.5rem)] font-semibold text-outline text-gold/80",
-    position: "lg:left-[calc(50%+35vh)] lg:top-[49%] xl:left-[calc(50%+44vh)] xl:top-[48%]",
+    position: "lg:left-[calc(58%+31vh)] lg:top-[49%] xl:left-[calc(50%+44vh)] xl:top-[48%]",
     exit: { x: "6vw", y: "12vh", scale: 1, fade: [0.4, 0.85] },
   },
   {
     word: "Docker",
     className: "font-mono text-[clamp(0.7rem,1vw,1.25rem)] tracking-[0.45em] text-faint",
-    position: "lg:left-[calc(50%+23vh)] lg:top-[63%] xl:left-[calc(50%+28vh)] xl:top-[62%]",
+    position: "lg:left-[calc(58%+23vh)] lg:top-[63%] xl:left-[calc(50%+28vh)] xl:top-[62%]",
     exit: { x: "2vw", y: "-3vh", scale: 1, fade: [0.2, 0.6] },
   },
 ];
@@ -89,9 +90,10 @@ type HeroProps = {
   progress: MotionValue<number>;
   ui: ImmersiveDictionary;
   content: HeroContent;
+  resumeUrl: string | null;
 };
 
-export function HeroSection({ progress, ui, content }: HeroProps) {
+export function HeroSection({ progress, ui, content, resumeUrl }: HeroProps) {
   const [first, ...rest] = content.name.split(" ");
   const nameY = useTransform(progress, [0, 1], ["0vh", "-18vh"]);
   const nameOpacity = useTransform(progress, [0, 0.05, 0.6, 1], [1, 1, 0, 0]);
@@ -104,7 +106,7 @@ export function HeroSection({ progress, ui, content }: HeroProps) {
       <div className="sticky top-0 flex h-svh flex-col overflow-hidden px-5 pt-24 pb-10 sm:px-8 lg:px-14">
         <motion.div
           style={{ y: nameY, opacity: nameOpacity, scale: nameScale }}
-          className="relative z-10 flex flex-col max-lg:items-center max-lg:text-center lg:absolute lg:bottom-[22%] lg:left-14 lg:max-w-[40vw] lg:origin-bottom-left"
+          className="relative z-10 flex flex-col max-lg:items-center max-lg:text-center lg:absolute lg:bottom-[16%] lg:left-14 lg:max-w-[40vw] lg:origin-bottom-left"
         >
           <p className="animate-[rise-in_0.7s_ease_0.2s_both] font-mono text-xs tracking-[0.3em] text-gold uppercase">
             {ui.hero.greeting}
@@ -120,13 +122,36 @@ export function HeroSection({ progress, ui, content }: HeroProps) {
           </h1>
           <div className="animate-[fade-in_0.8s_ease_0.55s_both]">
             <p className="mt-5 text-lg font-medium text-fg sm:text-xl">{content.role}</p>
-            <p className="mt-3 hidden max-w-sm text-sm leading-relaxed text-pretty text-muted xl:block">
-              {content.headline}
-            </p>
+            <p className="mt-2 max-w-sm text-sm leading-relaxed text-pretty text-muted sm:text-[15px]">{content.headline}</p>
+            <div className="mt-7 flex flex-wrap items-center gap-2 max-lg:justify-center sm:gap-3">
+              <a
+                href="#work"
+                className="inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-gold-soft sm:px-5"
+              >
+                {ui.hero.projects}
+                <ArrowDown size={15} aria-hidden="true" />
+              </a>
+              <a
+                href="#contact"
+                className="inline-flex items-center rounded-full border border-fg/20 px-4 py-2.5 text-sm text-fg transition-colors hover:border-gold hover:text-gold sm:px-5"
+              >
+                {ui.hero.contact}
+              </a>
+              {resumeUrl && (
+                <a
+                  href={resumeUrl}
+                  download
+                  className="inline-flex items-center gap-2 px-2 py-2.5 text-sm text-muted transition-colors hover:text-fg"
+                >
+                  <FileText size={15} aria-hidden="true" />
+                  {ui.resume}
+                </a>
+              )}
+            </div>
           </div>
         </motion.div>
 
-        <p className="absolute top-[15%] left-[61%] hidden animate-[fade-in_0.8s_ease_0.5s_both] items-center gap-3 font-mono text-[11px] tracking-[0.3em] text-muted uppercase lg:left-[calc(50%+17vh)] lg:flex xl:left-[calc(50%+21vh)]">
+        <p className="absolute top-[15%] left-[61%] hidden animate-[fade-in_0.8s_ease_0.5s_both] items-center gap-3 font-mono text-[11px] tracking-[0.3em] text-muted uppercase lg:left-[calc(58%+17vh)] lg:flex xl:left-[calc(50%+21vh)]">
           <span className="h-px w-10 bg-gold/60" aria-hidden="true" />
           {ui.hero.side}
         </p>
@@ -134,12 +159,6 @@ export function HeroSection({ progress, ui, content }: HeroProps) {
           {ui.hero.stackLabel}: {words.join(", ")}
         </p>
 
-        <p
-          aria-hidden="true"
-          className="relative z-10 mt-4 animate-[fade-in_0.8s_ease_0.7s_both] text-center font-mono text-[11px] tracking-[0.35em] text-faint uppercase lg:hidden"
-        >
-          {words.join(" · ")}
-        </p>
 
         <motion.div
           style={{ opacity: cueOpacity }}

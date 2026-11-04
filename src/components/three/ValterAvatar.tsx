@@ -1,33 +1,21 @@
 "use client";
 
-import { useTexture } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { Component, Suspense, lazy, useMemo, useRef, type ReactNode } from "react";
-import * as THREE from "three";
-import { AVATAR_TOP, LOOK_PITCH, LOOK_YAW, useFirstFrame, type PartProps, type Pointer } from "./avatar-shared";
+import { Component, Suspense, lazy, type ReactNode } from "react";
+import type { Pointer } from "./avatar-shared";
 
 export type { Pointer };
+
+export type AvatarAssets = {
+  // Modelo 3D (public/models/valter-avatar.glb), usado só com avatarMode "glb"
+  model: string | null;
+  // Retrato da hero (public/models/valter-portrait.*), exibido como imagem comum
+  portrait: string | null;
+};
 
 // O carregador de GLB (GLTFLoader, Draco, Meshopt) só é baixado quando existe um modelo em uso.
 const ModelAvatar = lazy(() => import("./ModelAvatar"));
 
-export type AvatarAssets = {
-  // Modelo 3D definitivo (public/models/valter-avatar.glb)
-  model: string | null;
-  // Retrato usado em relevo 2.5D enquanto o modelo não existe (public/models/valter-portrait.*)
-  portrait: string | null;
-};
-
-type AvatarProps = {
-  assets: AvatarAssets;
-  // URL efetivamente carregada pela <img> da hero, para a textura reaproveitar o cache do navegador.
-  portraitSrc: string | null;
-  pointer: Pointer;
-  animate: boolean;
-  onReady: () => void;
-};
-
-class AvatarErrorBoundary extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
+class AvatarErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
 
   static getDerivedStateFromError() {
@@ -35,246 +23,19 @@ class AvatarErrorBoundary extends Component<{ fallback: ReactNode; children: Rea
   }
 
   render() {
-    return this.state.failed ? this.props.fallback : this.props.children;
+    return this.state.failed ? null : this.props.children;
   }
 }
 
-// Ordem: modelo GLB → retrato em relevo → busto abstrato (só quando não há retrato).
-// Nada aparece enquanto um asset carrega: a <img> da hero continua visível até o 3D estar pronto.
-export function ValterAvatar({ assets, portraitSrc, pointer, animate, onReady }: AvatarProps) {
-  const parts = { pointer, animate, onReady };
-  const portraitUrl = portraitSrc ?? assets.portrait;
-  const portrait = portraitUrl ? (
-    <AvatarErrorBoundary fallback={null}>
+const noop = () => undefined;
+
+// Modelo GLB na cena. Se o arquivo falhar, a cena segue sem ele.
+export function ValterAvatar({ model, pointer }: { model: string; pointer: Pointer }) {
+  return (
+    <AvatarErrorBoundary>
       <Suspense fallback={null}>
-        <PortraitRelief url={portraitUrl} {...parts} />
+        <ModelAvatar url={model} pointer={pointer} animate onReady={noop} />
       </Suspense>
     </AvatarErrorBoundary>
-  ) : (
-    <StylizedBust {...parts} />
-  );
-
-  if (!assets.model) return portrait;
-
-  return (
-    <AvatarErrorBoundary fallback={portrait}>
-      <Suspense fallback={null}>
-        <ModelAvatar url={assets.model} {...parts} />
-      </Suspense>
-    </AvatarErrorBoundary>
-  );
-}
-
-// Retrato em relevo: a imagem ganha profundidade aproximada (cabeça e tronco) e reage ao cursor.
-// Não é um modelo 3D do rosto; funciona bem só para rotações pequenas.
-const PORTRAIT_HEIGHT = 3.9;
-// Pontos de referência do retrato, em proporção da imagem (0 a 1). Ajuste se trocar a imagem.
-const portraitShape = {
-  hairTop: 0.09,
-  head: { u: 0.505, v: 0.385, rx: 0.27, ry: 0.31, depth: 0.55 },
-  nose: { u: 0.465, v: 0.4, size: 0.045, depth: 0.12 },
-  torso: { u: 0.5, v: 1.05, rx: 0.64, ry: 0.5, depth: 0.42 },
-};
-
-function dome(u: number, v: number, shape: { u: number; v: number; rx: number; ry: number; depth: number }) {
-  const r = ((u - shape.u) / shape.rx) ** 2 + ((v - shape.v) / shape.ry) ** 2;
-  return r < 1 ? Math.sqrt(1 - r) * shape.depth : 0;
-}
-
-function createRelief(aspect: number) {
-  const width = PORTRAIT_HEIGHT * aspect;
-  const geometry = new THREE.PlaneGeometry(width, PORTRAIT_HEIGHT, 140, 175);
-  const position = geometry.attributes.position;
-  const uv = geometry.attributes.uv;
-  const { head, nose, torso } = portraitShape;
-  for (let i = 0; i < position.count; i++) {
-    const u = uv.getX(i);
-    const v = 1 - uv.getY(i);
-    const bump = Math.exp(-(((u - nose.u) ** 2 + (v - nose.v) ** 2) / (2 * nose.size ** 2))) * nose.depth;
-    position.setZ(i, Math.max(dome(u, v, head) + bump, dome(u, v, torso)));
-  }
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-const smoothstep = (edge0: number, edge1: number, x: number) => {
-  const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
-  return t * t * (3 - 2 * t);
-};
-
-// Máscara que dissolve as bordas do retrato no fundo do site (lida pelo canal verde do alphaMap).
-function createEdgeMask() {
-  const width = 128;
-  const height = 160;
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
-  if (context) {
-    const pixels = context.createImageData(width, height);
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const u = x / (width - 1);
-        const v = y / (height - 1);
-        const sides = 1 - smoothstep(0.3, 0.44, Math.abs(u - 0.5));
-        const top = smoothstep(0.02, 0.08, v);
-        const bottom = 1 - smoothstep(0.8, 0.98, v);
-        const value = Math.round(sides * top * bottom * 255);
-        pixels.data.set([value, value, value, 255], (y * width + x) * 4);
-      }
-    }
-    context.putImageData(pixels, 0, 0);
-  }
-  return new THREE.CanvasTexture(canvas);
-}
-
-function PortraitRelief({ url, pointer, animate, onReady }: PartProps & { url: string }) {
-  const root = useRef<THREE.Group>(null);
-  const relief = useRef<THREE.Mesh>(null);
-  const startedAt = useRef<number | null>(null);
-  const texture = useTexture(url, (loaded) => {
-    loaded.colorSpace = THREE.SRGBColorSpace;
-    loaded.anisotropy = 4;
-  });
-  const image = texture.image as { width: number; height: number };
-  const aspect = image.width / image.height;
-  const geometry = useMemo(() => createRelief(aspect), [aspect]);
-  const mask = useMemo(() => createEdgeMask(), []);
-  const centerY = AVATAR_TOP + portraitShape.hairTop * PORTRAIT_HEIGHT - PORTRAIT_HEIGHT / 2;
-
-  useFirstFrame(onReady);
-
-  useFrame(({ clock }, delta) => {
-    if (!root.current || !relief.current) return;
-    startedAt.current ??= clock.elapsedTime;
-    // Começa plano, idêntico à <img> da hero, e ganha profundidade depois da troca.
-    const since = clock.elapsedTime - startedAt.current;
-    const live = animate ? THREE.MathUtils.smootherstep(since, 0.5, 1.4) : 1;
-    const time = animate ? since : 0;
-    relief.current.scale.z = Math.max(live, 0.001);
-    root.current.rotation.y = THREE.MathUtils.damp(
-      root.current.rotation.y,
-      pointer.x.get() * LOOK_YAW * 0.8 * live,
-      3,
-      delta,
-    );
-    root.current.rotation.x = THREE.MathUtils.damp(root.current.rotation.x, pointer.y.get() * LOOK_PITCH * live, 3, delta);
-    root.current.position.y = Math.sin(time * 1.1) * 0.008 * live;
-    root.current.scale.y = 1 + Math.sin(time * 1.1) * 0.003 * live;
-  });
-
-  return (
-    <group ref={root}>
-      <mesh ref={relief} geometry={geometry} position={[0, centerY, 0]}>
-        <meshBasicMaterial map={texture} alphaMap={mask} transparent toneMapped={false} />
-      </mesh>
-    </group>
-  );
-}
-
-// Busto abstrato usado só em desenvolvimento: silhueta escura sem rosto, com cabelo, barba e camiseta sugeridos.
-const torsoProfile = [
-  [0, -2.6],
-  [0.88, -2.6],
-  [0.93, -1.3],
-  [0.97, -0.95],
-  [0.96, -0.72],
-  [0.9, -0.56],
-  [0.74, -0.44],
-  [0.52, -0.36],
-  [0.34, -0.27],
-  [0.27, -0.17],
-  [0, -0.13],
-].map(([radius, y]) => new THREE.Vector2(radius, y));
-
-const clay = { color: "#2a3140", roughness: 0.38, metalness: 0.25, clearcoat: 0.9, clearcoatRoughness: 0.3 };
-const fabric = { color: "#0e1015", roughness: 0.92, metalness: 0, sheen: 0.6, sheenRoughness: 0.8, sheenColor: "#2d3546" };
-const hair = { color: "#0d0f14", roughness: 0.75, metalness: 0.05 };
-const beard = { color: "#11141b", roughness: 0.95, metalness: 0 };
-
-function createHead() {
-  const geometry = new THREE.SphereGeometry(1, 64, 64);
-  const position = geometry.attributes.position;
-  for (let i = 0; i < position.count; i++) {
-    const y = position.getY(i);
-    const taper = y < 0 ? 1 - 0.12 * Math.abs(y) ** 1.6 : 1;
-    position.setXYZ(i, position.getX(i) * taper, y, position.getZ(i) * taper + (y < 0 ? 0.05 * -y : 0));
-  }
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function StylizedBust({ pointer, animate, onReady }: PartProps) {
-  const body = useRef<THREE.Group>(null);
-  useFirstFrame(onReady);
-  const torso = useRef<THREE.Group>(null);
-  const headGroup = useRef<THREE.Group>(null);
-
-  const parts = useMemo(
-    () => ({
-      torso: new THREE.LatheGeometry(torsoProfile, 64),
-      head: createHead(),
-      hair: new THREE.SphereGeometry(1, 48, 32, 0, Math.PI * 2, 0, Math.PI * 0.42),
-      beard: new THREE.SphereGeometry(1, 48, 24, Math.PI * 0.05, Math.PI * 0.9, Math.PI * 0.7, Math.PI * 0.3),
-    }),
-    [],
-  );
-
-  useFrame(({ clock }, delta) => {
-    const time = animate ? clock.elapsedTime : 0;
-    const lookX = pointer.x.get();
-    const lookY = pointer.y.get();
-
-    if (body.current) {
-      body.current.rotation.y = THREE.MathUtils.damp(
-        body.current.rotation.y,
-        lookX * LOOK_YAW * 0.6 + Math.sin(time * 0.35) * 0.03,
-        2.5,
-        delta,
-      );
-    }
-    if (torso.current) torso.current.scale.y = 1 + Math.sin(time * 1.2) * 0.006;
-    if (headGroup.current) {
-      headGroup.current.rotation.y = THREE.MathUtils.damp(headGroup.current.rotation.y, lookX * LOOK_YAW, 3, delta);
-      headGroup.current.rotation.x = THREE.MathUtils.damp(
-        headGroup.current.rotation.x,
-        lookY * LOOK_PITCH + Math.sin(time * 0.7) * 0.012,
-        3,
-        delta,
-      );
-      headGroup.current.position.y = 0.04 + Math.sin(time * 1.2) * 0.005;
-    }
-  });
-
-  return (
-    <group ref={body}>
-      <group ref={torso}>
-        <mesh geometry={parts.torso} scale={[1.5, 1, 0.66]}>
-          <meshPhysicalMaterial {...fabric} />
-        </mesh>
-        <mesh position={[0, -0.16, 0.01]} rotation={[Math.PI / 2, 0, 0]} scale={[1.12, 0.86, 1]}>
-          <torusGeometry args={[0.29, 0.035, 12, 48]} />
-          <meshPhysicalMaterial {...fabric} color="#16191f" />
-        </mesh>
-      </group>
-
-      <group ref={headGroup} position={[0, 0.04, 0]}>
-        <mesh position={[0, -0.06, 0]}>
-          <cylinderGeometry args={[0.21, 0.25, 0.28, 32]} />
-          <meshPhysicalMaterial {...clay} />
-        </mesh>
-        <group position={[0, 0.5, 0]}>
-          <mesh geometry={parts.head} scale={[0.46, 0.53, 0.49]}>
-            <meshPhysicalMaterial {...clay} />
-          </mesh>
-          <mesh geometry={parts.beard} scale={[0.475, 0.545, 0.51]}>
-            <meshStandardMaterial {...beard} side={THREE.DoubleSide} />
-          </mesh>
-          <mesh geometry={parts.hair} position={[0, 0.03, -0.015]} rotation={[-0.18, 0, 0.1]} scale={[0.49, 0.53, 0.52]}>
-            <meshStandardMaterial {...hair} side={THREE.DoubleSide} />
-          </mesh>
-        </group>
-      </group>
-    </group>
   );
 }

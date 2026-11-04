@@ -10,6 +10,8 @@ export type ProjectDetails = {
   features?: Localized<string[]>;
   challenges?: Localized<string[]>;
   learnings?: Localized<string[]>;
+  // Minha participação, em 1 a 3 itens curtos (aparece no painel do projeto na home).
+  role?: Localized<string[]>;
 };
 
 export type Project = {
@@ -22,8 +24,9 @@ export type Project = {
   plannedTechnologies?: string[];
   github?: string;
   live?: string;
-  // Capa do card. Coloque a imagem em public/projects/<slug>/ e informe o caminho, ex.: "/projects/eitanol/cover.png".
-  // Sem imagem, o card usa uma capa gerada.
+  // Capturas reais em public/projects/<slug>/, ex.: image: "/projects/eitanol/cover.png" e
+  // screenshots: ["/projects/eitanol/01.png"]. A capa abre a galeria do painel; sem imagem, aparece um
+  // espaço reservado indicando que a captura ainda vai entrar.
   image?: string;
   screenshots?: string[];
   featured?: boolean;
@@ -39,8 +42,8 @@ export const projects: Project[] = [
     slug: "orca-ai",
     title: "Orça Aí",
     description: {
-      pt: "SaaS multiempresa para orçamentos e propostas, começando por empresas de obras e reformas. Backend em Spring Boot com isolamento de dados entre empresas e autenticação por sessão.",
-      en: "Multi-tenant SaaS for estimates and proposals, starting with construction and renovation companies. Spring Boot backend with per-company data isolation and session-based authentication.",
+      pt: "SaaS multiempresa para orçamentos e propostas de empresas de obras e reformas, com backend em Spring Boot.",
+      en: "Multi-tenant SaaS for estimates and proposals for construction and renovation companies, with a Spring Boot backend.",
     },
     categories: ["backend", "fullstack"],
     status: "in-progress",
@@ -113,14 +116,26 @@ export const projects: Project[] = [
           "Integration tests against a real PostgreSQL with Testcontainers and versioned migrations with Flyway.",
         ],
       },
+      role: {
+        pt: [
+          "Modelagem do domínio e decisões de arquitetura: monólito modular e multi-tenancy.",
+          "Backend em Spring Boot com autenticação, equipe e clientes, coberto por testes de integração.",
+          "Frontend em Next.js e ambiente local com Docker Compose.",
+        ],
+        en: [
+          "Domain modeling and architecture decisions: modular monolith and multi-tenancy.",
+          "Spring Boot backend with authentication, team and customers, covered by integration tests.",
+          "Next.js frontend and local environment with Docker Compose.",
+        ],
+      },
     },
   },
   {
     slug: "eitanol",
     title: "EiTanol",
     description: {
-      pt: "Plataforma de comparação de preços de combustíveis por região, pensada para responder onde realmente compensa abastecer. Construída em etapas, com decisões de arquitetura registradas em ADRs.",
-      en: "Fuel price comparison platform by region, designed to answer where it actually pays to fill up. Built in stages, with architecture decisions recorded as ADRs.",
+      pt: "Plataforma que compara preços de combustíveis por região para mostrar onde realmente compensa abastecer.",
+      en: "Platform that compares fuel prices by region to show where it actually pays to fill up.",
     },
     categories: ["backend", "fullstack"],
     status: "in-progress",
@@ -175,14 +190,26 @@ export const projects: Project[] = [
           "Deferring tools like Redis, queues and observability until there is a real need, recording each decision in ADRs.",
         ],
       },
+      role: {
+        pt: [
+          "Arquitetura e roadmap, com cada decisão registrada em ADRs.",
+          "Modelagem do domínio de postos e preços, com testes unitários.",
+          "Fundação com Spring Boot, Next.js e PostgreSQL + PostGIS via Docker Compose.",
+        ],
+        en: [
+          "Architecture and roadmap, with each decision recorded in ADRs.",
+          "Domain modeling for stations and prices, with unit tests.",
+          "Foundation with Spring Boot, Next.js and PostgreSQL + PostGIS via Docker Compose.",
+        ],
+      },
     },
   },
   {
     slug: "jurimetria-ia",
     title: { pt: "Jurimetria IA", en: "Jurimetria AI" },
     description: {
-      pt: "Trabalho de conclusão de curso: sistema para acompanhar processos judiciais que usa IA para extrair um resumo estruturado de sentenças e acórdãos e alimentar um painel de jurimetria.",
-      en: "Capstone project: a system for tracking court cases that uses AI to extract structured summaries from rulings and feed a jurimetrics dashboard.",
+      pt: "TCC: sistema de acompanhamento de processos que usa IA para resumir decisões judiciais e alimentar um painel de jurimetria.",
+      en: "Capstone project: a case tracking system that uses AI to summarize court rulings and feed a jurimetrics dashboard.",
     },
     categories: ["fullstack", "ai", "academic"],
     status: "mvp",
@@ -240,16 +267,21 @@ export const projects: Project[] = [
           "Automated tests with node:test that never call the real API or require a running database.",
         ],
       },
+      role: {
+        pt: ["Trabalho de conclusão de curso desenvolvido em dupla com Marcelo Cruz Caceraghi."],
+        en: ["Capstone project built as a pair with Marcelo Cruz Caceraghi."],
+      },
     },
   },
   {
     slug: "forest-of-the-fallen",
     title: "Forest of the Fallen",
     description: {
-      pt: "Jogo 3D desenvolvido em Unity, com sistemas de combate, inimigos com IA, controle do jogador e animações.",
-      en: "3D game built in Unity, with combat systems, AI-driven enemies, player controllers and animations.",
+      pt: "Jogo 3D low-poly de ação e sobrevivência feito em Unity para uma disciplina da faculdade, com combate, inimigos com IA e animações.",
+      en: "Low-poly 3D action/survival game built in Unity for a college course, with combat, AI-driven enemies and animations.",
     },
-    categories: ["games"],
+    categories: ["games", "academic"],
+    status: "in-progress",
     featured: true,
     technologies: ["Unity"],
   },
@@ -261,6 +293,7 @@ export const projects: Project[] = [
       en: "Artificial intelligence project. Details will be published along with the repository.",
     },
     categories: ["ai"],
+    featured: true,
     technologies: [],
   },
   {
@@ -272,6 +305,7 @@ export const projects: Project[] = [
     },
     categories: [],
     status: "in-progress",
+    featured: true,
     technologies: [],
   },
   {

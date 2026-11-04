@@ -44,12 +44,7 @@ export default async function HomePage({ params }: PageProps) {
         <AboutSection ui={ui} content={content} />
         <StackSection ui={ui} content={content} />
         <ExperienceSection ui={ui} content={content} />
-        <WorkSection
-          ui={ui}
-          projects={content.projects}
-          labels={content.labels}
-          repositories={content.links.repositories}
-        />
+        <WorkSection ui={ui} projects={content.projects} repositories={content.links.repositories} />
         <EducationSection ui={ui} content={content} />
         <ContactSection ui={ui} email={content.email} links={content.links} resumeUrl={resumeUrl} />
       </ImmersivePage>

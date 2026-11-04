@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { FloatingTech } from "./FloatingTech";
 import { SceneLights } from "./SceneLights";
 import { SceneParticles } from "./SceneParticles";
+import { useFirstFrame } from "./avatar-shared";
 import { ValterAvatar, type AvatarAssets, type Pointer } from "./ValterAvatar";
 
 export type SceneProgress = {
@@ -17,12 +18,10 @@ export type SceneProgress = {
 
 type PortfolioSceneProps = {
   avatar: AvatarAssets;
-  portraitSrc: string | null;
   progress: SceneProgress;
   pointer: Pointer;
   quality: "full" | "lite";
   compact: boolean;
-  animate: boolean;
   active: boolean;
   onReady: () => void;
 };
@@ -62,19 +61,14 @@ function mix(a: Pose, b: Pose, t: number): Pose {
   };
 }
 
-function Choreography({
-  progress,
-  compact,
-  animate,
-  yaw,
-  children,
-}: {
-  progress: SceneProgress;
-  compact: boolean;
-  animate: boolean;
-  yaw: number;
-  children: ReactNode;
-}) {
+// Avisa a página quando o primeiro quadro foi desenhado, para o fundo 3D entrar com fade.
+function FirstFrame({ onReady }: { onReady: () => void }) {
+  useFirstFrame(onReady);
+  return null;
+}
+
+// Coreografia do modelo GLB ao longo do scroll (só existe com avatarMode "glb").
+function Choreography({ progress, compact, children }: { progress: SceneProgress; compact: boolean; children: ReactNode }) {
   const group = useRef<THREE.Group>(null);
   const placed = useRef(false);
 
@@ -90,23 +84,20 @@ function Choreography({
     pose = mix(pose, set.stack, stack);
     pose.rotY += Math.max(0, tech - 0.3) * 0.7;
     pose = mix(pose, set.contact, smooth(progress.contact.get()));
-    if (!animate) pose = { ...start };
-    pose.rotY *= yaw;
 
     const cameraZ = (compact ? 9.4 : 7.6) - hero * 0.35 + stack * 0.45;
     const g = group.current;
     if (!g) return;
 
-    // O primeiro quadro já nasce na pose certa (casa com a imagem da hero). Depois, um amortecimento curto
-    // só para suavizar o scroll, sem a sensação de o avatar correr atrás da página.
-    const rate = animate && placed.current ? 7 : Infinity;
+    // O primeiro quadro já nasce na pose certa; depois, um amortecimento curto só para suavizar o scroll.
+    const rate = placed.current ? 7 : Infinity;
     placed.current = true;
     g.position.x = THREE.MathUtils.damp(g.position.x, pose.x, rate, delta);
     g.position.y = THREE.MathUtils.damp(g.position.y, pose.y, rate, delta);
     g.position.z = THREE.MathUtils.damp(g.position.z, pose.z, rate, delta);
     g.rotation.y = THREE.MathUtils.damp(g.rotation.y, pose.rotY, rate, delta);
     g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, pose.scale, rate, delta));
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, animate ? cameraZ : compact ? 9.4 : 7.6, rate, delta);
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, cameraZ, rate, delta);
   });
 
   return <group ref={group}>{children}</group>;
@@ -115,34 +106,33 @@ function Choreography({
 // Configuração da cena 3D
 export default function PortfolioScene({
   avatar,
-  portraitSrc,
   progress,
   pointer,
   quality,
   compact,
-  animate,
   active,
   onReady,
 }: PortfolioSceneProps) {
   const lite = quality === "lite";
-  // O retrato em relevo não aguenta giros grandes, então a coreografia gira menos.
-  const yaw = avatar.model || !avatar.portrait ? 1 : 0.22;
 
   return (
     <Canvas
       dpr={lite ? [1, 1.25] : [1, 1.5]}
       camera={{ position: [0, 0.25, compact ? 9.4 : 7.6], fov: 32 }}
       gl={{ antialias: !lite, alpha: true, powerPreference: "high-performance" }}
-      frameloop={!active ? "never" : animate ? "always" : "demand"}
+      frameloop={active ? "always" : "never"}
       style={{ pointerEvents: "none" }}
     >
       <fog attach="fog" args={["#080b11", 8, 16]} />
       <SceneLights />
-      <Choreography progress={progress} compact={compact} animate={animate} yaw={yaw}>
-        <ValterAvatar assets={avatar} portraitSrc={portraitSrc} pointer={pointer} animate={animate} onReady={onReady} />
-      </Choreography>
-      {!lite && <FloatingTech tech={progress.tech} pointer={pointer} animate={animate} />}
-      <SceneParticles count={lite ? 90 : 260} pointer={pointer} animate={animate} />
+      <FirstFrame onReady={onReady} />
+      {avatar.model && (
+        <Choreography progress={progress} compact={compact}>
+          <ValterAvatar model={avatar.model} pointer={pointer} />
+        </Choreography>
+      )}
+      {!lite && <FloatingTech tech={progress.tech} pointer={pointer} animate />}
+      <SceneParticles count={lite ? 90 : 260} pointer={pointer} animate />
     </Canvas>
   );
 }

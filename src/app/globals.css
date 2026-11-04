@@ -123,23 +123,6 @@
     color: transparent;
     -webkit-text-stroke: 1px currentColor;
   }
-
-  /* Detalhes que aparecem no hover só em dispositivos com mouse; no toque ficam sempre visíveis */
-  @media (hover: hover) and (min-width: 1024px) {
-    .hover-reveal {
-      grid-template-rows: 0fr;
-      opacity: 0;
-      transition:
-        grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 0.3s ease;
-    }
-
-    .group:hover .hover-reveal,
-    .group:focus-within .hover-reveal {
-      grid-template-rows: 1fr;
-      opacity: 1;
-    }
-  }
 }
 
 @keyframes scroll-cue {
@@ -165,13 +148,20 @@
   }
 }
 
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
   }
 }
 
-/* Mesmo recorte de bordas aplicado à textura do relevo 3D, para a troca imagem → 3D não aparecer. */
+/* Dissolve as bordas do retrato da hero no fundo do site */
 .portrait-mask {
   -webkit-mask-image:
     linear-gradient(to right, transparent 6%, black 20%, black 80%, transparent 94%),
@@ -181,4 +171,9 @@
     linear-gradient(to right, transparent 6%, black 20%, black 80%, transparent 94%),
     linear-gradient(to bottom, transparent 2%, black 8%, black 80%, transparent 98%);
   mask-composite: intersect;
+}
+
+/* Página parada enquanto o painel de projeto está aberto */
+html:has(dialog[open]) {
+  overflow: hidden;
 }

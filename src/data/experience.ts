@@ -33,16 +33,14 @@ export const experience: Experience[] = [
     },
     highlights: {
       pt: [
-        "Atendimento e resolução de incidentes técnicos como suporte especializado de segundo nível.",
+        "Resolução de incidentes técnicos como suporte de segundo nível (L2), de ponta a ponta e dentro dos SLAs.",
         "Investigação de causa raiz dos problemas reportados.",
-        "Suporte a ativos e à infraestrutura de rede.",
-        "Acompanhamento de chamados de ponta a ponta, seguindo os SLAs acordados.",
+        "Suporte a ativos e à infraestrutura de rede, com foco na estabilidade dos sistemas.",
       ],
       en: [
-        "Handled and resolved technical incidents as specialized second-level support.",
+        "Resolved technical incidents as second-level (L2) support, end to end and within SLAs.",
         "Investigated the root cause of reported issues.",
-        "Supported IT assets and network infrastructure.",
-        "Followed tickets end to end within the agreed SLAs.",
+        "Supported IT assets and network infrastructure, focused on system stability.",
       ],
     },
     tags: ["IT Support", "Infrastructure", "Troubleshooting", "Incident Management", "Root Cause Analysis"],
@@ -63,16 +61,14 @@ export const experience: Experience[] = [
     },
     highlights: {
       pt: [
-        "Desenvolvimento e manutenção de funcionalidades web para clínicas odontológicas.",
-        "Fluxos de agendamento, procedimentos e registros médicos.",
-        "Integração e automação de workflows com n8n.",
-        "Interfaces em React e dados em SQL Server.",
+        "Funcionalidades web para clínicas odontológicas: agendamento, procedimentos e registros clínicos.",
+        "Interfaces em React com dados em SQL Server.",
+        "Integrações e automação de fluxos com n8n.",
       ],
       en: [
-        "Developed and maintained web features for dental clinics.",
-        "Worked on scheduling, procedure and medical record flows.",
-        "Integrated and automated workflows with n8n.",
-        "Built React interfaces backed by SQL Server.",
+        "Web features for dental clinics: scheduling, procedures and clinical records.",
+        "React interfaces backed by SQL Server.",
+        "Integrations and workflow automation with n8n.",
       ],
     },
     tags: ["Java","Spring","NodeJS", "Typescript", "SQL Server", "n8n"],

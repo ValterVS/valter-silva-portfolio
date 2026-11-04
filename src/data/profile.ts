@@ -28,13 +28,13 @@ export const profile = {
   } satisfies Localized,
 
   headline: {
-    pt: "Desenvolvedor de software focado na construção de aplicações modernas, APIs e sistemas completos — soluções que conectam tecnologia a problemas reais.",
-    en: "Software developer focused on building modern applications, APIs and complete systems — solutions that connect technology to real problems.",
+    pt: "Desenvolvedor de software com foco em backend: APIs e sistemas com Java, Spring Boot e bancos de dados.",
+    en: "Software developer focused on backend: APIs and systems built with Java, Spring Boot and databases.",
   } satisfies Localized,
 
   statement: {
-    pt: "Construo software para transformar problemas reais em produtos digitais.",
-    en: "I build software that turns real problems into digital products.",
+    pt: "Gosto de entender o problema a fundo e transformar requisitos em software simples e confiável.",
+    en: "I like to understand problems in depth and turn requirements into simple, reliable software.",
   } satisfies Localized,
 
   focus: {
@@ -44,14 +44,12 @@ export const profile = {
 
   about: {
     pt: [
-      "Sou estudante de Engenharia de Software na Unilins e estou no último período da graduação. Minha trajetória passa tanto pelo desenvolvimento quanto pelo suporte técnico: já construí aplicações web e integrações entre sistemas, trabalhei com banco de dados e atuei com suporte L2 e infraestrutura.",
-      "Meu foco principal é o desenvolvimento backend/fullstack — Java, Spring Boot, NodeJS, Typescript, APIs, banco de dados e arquitetura de software — sempre pensando no produto que está sendo construído, não só no código.",
-      "Também trabalho e estudo QA, automação e inteligência artificial. Ter passado pelo suporte me deu um olhar prático sobre o que acontece com o software depois do deploy: incidentes, causa raiz e estabilidade.",
+      "Estou na fase final de Engenharia de Software na Unilins e me especializando em desenvolvimento backend: Java, Spring Boot, APIs REST, modelagem de dados com PostgreSQL e arquitetura de software.",
+      "Me interesso por regras de negócio, integração entre sistemas e confiabilidade. A experiência com suporte L2 me deu um olhar prático sobre o que acontece depois do deploy: incidentes, causa raiz e estabilidade.",
     ],
     en: [
-      "I'm a Software Engineering student at Unilins, in the final term of my degree. My path covers both development and technical support: I've built web applications and system integrations, worked with databases, and handled L2 support and infrastructure.",
-      "My main focus is backend/fullstack development — Java, Spring Boot,NodeJS, Typescript, APIs, databases and software architecture — always thinking about the product being built, not just the code.",
-      "I also work with and study QA, automation and artificial intelligence. Coming from support gave me a practical view of what happens to software after deployment: incidents, root causes and stability.",
+      "I'm in the final stage of a Software Engineering degree at Unilins, specializing in backend development: Java, Spring Boot, REST APIs, data modeling with PostgreSQL and software architecture.",
+      "I'm drawn to business rules, system integration and reliability. Working in L2 support gave me a practical view of what happens after deployment: incidents, root causes and stability.",
     ],
   } satisfies Localized<string[]>,
 };

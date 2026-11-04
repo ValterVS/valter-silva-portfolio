@@ -4,18 +4,16 @@ type Depth = "back" | "front";
 
 export type FlowItem = { name: string; depth: Depth; side: "left" | "right"; offset: number; usage: string };
 
-// Ordem e posição das tecnologias que sobem durante o scroll. Palavras "back" passam atrás do avatar.
+// Ordem e posição das tecnologias que sobem durante o scroll. As da frente (com rótulo de uso) são o núcleo
+// backend; as de trás passam como sombra atrás do conteúdo.
 export const flow: Omit<FlowItem, "usage">[] = [
-  { name: "Java", depth: "back", side: "left", offset: 8 },
+  { name: "Java", depth: "front", side: "left", offset: 8 },
   { name: "Spring Boot", depth: "front", side: "right", offset: 6 },
-  { name: "PostgreSQL", depth: "front", side: "left", offset: 6 },
-  { name: "Docker", depth: "back", side: "right", offset: 14 },
-  { name: "React", depth: "back", side: "left", offset: 28 },
-  { name: "TypeScript", depth: "front", side: "right", offset: 10 },
-  { name: "Node.js", depth: "front", side: "left", offset: 12 },
-  { name: "Git", depth: "back", side: "right", offset: 30 },
-  { name: "AWS", depth: "back", side: "left", offset: 38 },
-  { name: "Python", depth: "front", side: "right", offset: 16 },
+  { name: "SQL", depth: "back", side: "right", offset: 26 },
+  { name: "REST APIs", depth: "front", side: "left", offset: 10 },
+  { name: "Git", depth: "back", side: "left", offset: 30 },
+  { name: "PostgreSQL", depth: "front", side: "right", offset: 8 },
+  { name: "Docker", depth: "back", side: "left", offset: 14 },
 ];
 
 // Junta cada palavra com o rótulo de uso vindo de src/data/skills.ts.

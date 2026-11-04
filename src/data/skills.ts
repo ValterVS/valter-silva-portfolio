@@ -21,6 +21,7 @@ export const skillGroups: SkillGroup[] = [
       { name: "Node.js", usage: ["professional","projects", "studies"] },
       { name: "Express", usage: ["projects", "studies"] },
       { name: "REST APIs", usage: ["professional","projects", "studies"] },
+      { name: "Maven", usage: ["projects"] },
     ],
   },
   {
@@ -81,3 +82,13 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
 ];
+
+export type StackTier = "core" | "tools" | "additional";
+
+// Peso de cada tecnologia na home: o núcleo backend em destaque, o restante em camadas mais discretas.
+// Os nomes precisam existir em skillGroups (de lá vem onde cada uma foi usada).
+export const stackTiers: Record<StackTier, string[]> = {
+  core: ["Java", "Spring Boot", "REST APIs", "PostgreSQL", "SQL", "Git"],
+  tools: ["Spring Data JPA", "Spring Security", "Flyway", "Testcontainers", "Docker", "Docker Compose", "Maven", "GitHub"],
+  additional: ["React", "TypeScript", "JavaScript", "Node.js", "Express", "Next.js", "MySQL", "SQL Server", "n8n", "Python", "PHP", "Unity", "AWS"],
+};

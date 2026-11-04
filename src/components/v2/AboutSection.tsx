@@ -16,16 +16,14 @@ export function AboutSection({ ui, content }: { ui: ImmersiveDictionary; content
       <div className="max-w-2xl max-lg:rounded-3xl max-lg:bg-ink/70 max-lg:p-6 max-lg:backdrop-blur-sm lg:max-w-[46vw]">
         <FadeIn>
           <Eyebrow index="01">{ui.about.eyebrow}</Eyebrow>
-          <h2 id="about-title" className="mt-8 text-[clamp(2rem,4.4vw,4.25rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-balance">
+          <h2 id="about-title" className="mt-8 text-[clamp(1.75rem,3.4vw,3.25rem)] leading-[1.05] font-semibold tracking-[-0.03em] text-balance">
             {content.statement}
           </h2>
-        </FadeIn>
-        <FadeIn delay={0.1} className="mt-10 space-y-4 text-base leading-relaxed text-pretty text-muted sm:text-[17px]">
-          {content.about.map((paragraph) => (
-            <p key={paragraph.slice(0, 32)}>{paragraph}</p>
-          ))}
-        </FadeIn>
-        <FadeIn delay={0.15}>
+          <div className="mt-10 space-y-4 text-base leading-relaxed text-pretty text-muted sm:text-[17px]">
+            {content.about.map((paragraph) => (
+              <p key={paragraph.slice(0, 32)}>{paragraph}</p>
+            ))}
+          </div>
           <dl className="mt-12 grid gap-6 border-t border-fg/10 pt-8 sm:grid-cols-3">
             {facts.map((fact) =>
               fact.value ? (

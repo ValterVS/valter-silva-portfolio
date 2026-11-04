@@ -2,8 +2,8 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import type { AvatarAssets } from "@/components/three/ValterAvatar";
 
-// "portrait": usa o retrato em relevo e nunca busca o GLB.
-// "glb": usa public/models/valter-avatar.glb quando o arquivo existir (com o retrato como imagem inicial).
+// "portrait": usa o retrato como imagem (public/models/valter-portrait.*) e nunca busca o GLB.
+// "glb": usa public/models/valter-avatar.glb na cena 3D (desktop) quando o arquivo existir.
 export const avatarMode: "portrait" | "glb" = "portrait";
 
 const modelFile = "/models/valter-avatar.glb";

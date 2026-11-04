@@ -2,7 +2,6 @@
 
 import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { Locale } from "@/i18n/config";
 import type { ImmersiveDictionary } from "@/i18n/immersive";
@@ -13,6 +12,7 @@ import type { AvatarAssets } from "@/components/three/ValterAvatar";
 import type { ImmersiveContent } from "./content";
 import type { FlowItem } from "./flow";
 import { Corners } from "./Corners";
+import { Portrait } from "./Portrait";
 import { HeroSection, HeroStack, type HeroContent } from "./HeroSection";
 import { TechLayer } from "./TechFlow";
 import { V2Header } from "./V2Header";
@@ -32,8 +32,6 @@ type ImmersivePageProps = {
   footer: ReactNode;
 };
 
-const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
-
 function useSectionRef(id: string): RefObject<HTMLElement | null> {
   const ref = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {
@@ -49,7 +47,6 @@ export function ImmersivePage({ locale, ui, avatar, resumeUrl, links, hero: hero
   const finePointer = useFinePointer();
   const [ready, setReady] = useState(false);
   const [stageActive, setStageActive] = useState(true);
-  const [portraitSrc, setPortraitSrc] = useState<string | null>(null);
 
   // Os refs precisam existir antes dos useScroll abaixo (efeitos rodam na ordem em que são declarados).
   const heroRef = useSectionRef("hero");
@@ -77,22 +74,15 @@ export function ImmersivePage({ locale, ui, avatar, resumeUrl, links, hero: hero
     return () => window.removeEventListener("pointermove", onMove);
   }, [reduced, finePointer, rawX, rawY]);
 
-  const poster = !avatar.model && avatar.portrait ? avatar.portrait : null;
-  const canAnimate = (quality === "full" || quality === "lite") && !reduced;
-  // Desktop: 3D quando o navegador fica ocioso após o load. Celular/aparelho modesto: só no primeiro
-  // toque ou scroll (ou alguns segundos depois), para a rede e a CPU ficarem livres para o conteúdo.
-  const loaded = useAfterLoad(!canAnimate ? null : quality === "lite" ? "interaction" : "idle");
-  const showScene = canAnimate && loaded && (!poster || portraitSrc !== null);
-  const live = showScene && ready;
+  const portrait = !avatar.model ? avatar.portrait : null;
+  // A cena 3D (partículas e nós flutuantes, ou o modelo GLB) é só enfeite de fundo: fica para desktop
+  // com GPU, carregada quando o navegador está ocioso. No celular o conteúdo vem primeiro.
+  const sceneAllowed = !reduced && (quality === "full" || (quality === "lite" && Boolean(avatar.model)));
+  const loaded = useAfterLoad(!sceneAllowed ? null : quality === "lite" ? "interaction" : "idle");
+  const showScene = sceneAllowed && loaded;
 
-  // O palco some quando a lista de tecnologias chega e volta no contato. Enquanto só a imagem
-  // estática está na tela (centralizada), ela apenas acompanha a saída da hero.
-  const stageOpacity = useTransform(() => {
-    const heroValue = hero.get();
-    if (!live) return 1 - heroValue;
-    const back = compact ? Math.max(1 - heroValue * 0.7, clamp01(tech.get() * 4)) : 1;
-    return Math.max(Math.min(back, 1 - leaving.get()), contact.get());
-  });
+  // O fundo 3D some quando a lista de tecnologias chega e volta no contato.
+  const stageOpacity = useTransform(() => Math.max(1 - leaving.get(), contact.get()));
 
   useMotionValueEvent(stageOpacity, "change", (value) => setStageActive(value > 0.01));
 
@@ -110,44 +100,33 @@ export function ImmersivePage({ locale, ui, avatar, resumeUrl, links, hero: hero
       <HeroStack progress={hero} />
       {!reduced && <TechLayer depth="back" progress={tech} fade={leaving} items={flow} />}
 
-      <motion.div className="pointer-events-none fixed inset-0 z-10" style={{ opacity: stageOpacity }}>
-        {poster && (
-          // Mesmo enquadramento do primeiro quadro do relevo 3D (câmera fov 32, plano de 3,9 de altura).
-          <div
-            className={cx(
-              "portrait-mask absolute top-[35.07%] left-1/2 aspect-[4/5] h-[66.14%] -translate-x-1/2 transition-opacity duration-500 lg:top-[22.9%] lg:h-[81.38%] xl:top-[15.17%] xl:h-[92.55%]",
-              live && "opacity-0",
-            )}
-          >
-            <Image
-              src={poster}
-              alt={ui.hero.portraitAlt}
-              fill
-              preload
-              fetchPriority="high"
-              sizes="(min-width: 1280px) 74vh, (min-width: 1024px) 65vh, 53vh"
-              onLoad={(event) => setPortraitSrc(event.currentTarget.currentSrc || poster)}
-              onError={() => setPortraitSrc(poster)}
-              className="object-cover"
-            />
-          </div>
-        )}
-        {showScene && (
-          <div aria-hidden="true" className={cx("absolute inset-0 transition-opacity duration-500", !ready && "opacity-0")}>
+      {showScene && (
+        <motion.div aria-hidden="true" className="pointer-events-none fixed inset-0 z-10" style={{ opacity: stageOpacity }}>
+          <div className={cx("absolute inset-0 transition-opacity duration-700", !ready && "opacity-0")}>
             <PortfolioScene
               avatar={avatar}
-              portraitSrc={portraitSrc}
               progress={{ hero, tech, contact }}
               pointer={{ x: pointerX, y: pointerY }}
               quality={quality === "lite" ? "lite" : "full"}
               compact={compact}
-              animate
               active={stageActive}
               onReady={() => setReady(true)}
             />
           </div>
-        )}
-      </motion.div>
+        </motion.div>
+      )}
+
+      {portrait && (
+        <Portrait
+          src={portrait}
+          alt={ui.hero.portraitAlt}
+          hero={hero}
+          tech={tech}
+          contact={contact}
+          pointer={{ x: pointerX, y: pointerY }}
+          compact={compact}
+        />
+      )}
 
       {!reduced && <TechLayer depth="front" progress={tech} fade={leaving} items={flow} />}
 
@@ -155,7 +134,7 @@ export function ImmersivePage({ locale, ui, avatar, resumeUrl, links, hero: hero
       <Corners ui={ui} resumeUrl={resumeUrl} links={links} />
 
       <main id="content" className="relative z-30">
-        <HeroSection progress={hero} ui={ui} content={heroContent} />
+        <HeroSection progress={hero} ui={ui} content={heroContent} resumeUrl={resumeUrl} />
         {children}
       </main>
       {footer}

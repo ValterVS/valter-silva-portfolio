@@ -4,7 +4,7 @@ import { courses, education } from "@/data/education";
 import { experience } from "@/data/experience";
 import { profile } from "@/data/profile";
 import { projects } from "@/data/projects";
-import { skillGroups } from "@/data/skills";
+import { skillGroups, stackTiers, type StackTier } from "@/data/skills";
 
 // Converte os dados de src/data para o idioma atual antes de enviar para os componentes da V2.
 export function buildContent(locale: Locale) {
@@ -54,11 +54,16 @@ export function buildContent(locale: Locale) {
       featured: Boolean(project.featured),
       year: project.year ?? null,
       href: project.details ? localePath(locale, `/projects/${project.slug}`) : null,
+      gallery: [project.image, ...(project.screenshots ?? [])].filter((src): src is string => Boolean(src)),
+      problem: project.details?.problem?.[locale] ?? null,
+      solution: project.details?.solution?.[locale] ?? null,
+      role: project.details?.role?.[locale] ?? [],
     })),
     skills: skillGroups.map((group) => ({
       title: group.title[locale],
       skills: group.skills.map((skill) => ({ name: skill.name, usage: skill.usage })),
     })),
+    stack: buildStack(),
     labels: {
       usage: dict.skills.usage,
       details: dict.actions.details,
@@ -67,6 +72,14 @@ export function buildContent(locale: Locale) {
       instructor: dict.education.instructor,
     },
   };
+}
+
+function buildStack() {
+  const all = skillGroups.flatMap((group) => group.skills);
+  return (Object.keys(stackTiers) as StackTier[]).map((tier) => ({
+    tier,
+    skills: stackTiers[tier].map((name) => ({ name, usage: all.find((skill) => skill.name === name)?.usage ?? [] })),
+  }));
 }
 
 export type ImmersiveContent = ReturnType<typeof buildContent>;
