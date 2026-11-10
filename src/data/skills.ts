@@ -92,3 +92,24 @@ export const stackTiers: Record<StackTier, string[]> = {
   tools: ["Spring Data JPA", "Spring Security", "Flyway", "Testcontainers", "Docker", "Docker Compose", "Maven", "GitHub"],
   additional: ["React", "TypeScript", "JavaScript", "Node.js", "Express", "Next.js", "MySQL", "SQL Server", "n8n", "Python", "PHP", "Unity", "AWS"],
 };
+
+// Tecnologias essenciais exibidas na home, em grupos curtos e sem níveis de domínio.
+// Cada item precisa ter uso comprovado em experiência ou projeto listado no site.
+export const essentialSkills: { group: Localized; items: Localized<string[]> }[] = [
+  {
+    group: { pt: "Backend", en: "Backend" },
+    items: { pt: ["Java", "Spring Boot", "PostgreSQL"], en: ["Java", "Spring Boot", "PostgreSQL"] },
+  },
+  {
+    group: { pt: "Front-end", en: "Front end" },
+    items: { pt: ["React", "TypeScript", "Next.js"], en: ["React", "TypeScript", "Next.js"] },
+  },
+  {
+    group: { pt: "Ferramentas e qualidade", en: "Tooling and quality" },
+    items: { pt: ["Git", "Docker", "testes automatizados"], en: ["Git", "Docker", "automated testing"] },
+  },
+  {
+    group: { pt: "IA aplicada", en: "Applied AI" },
+    items: { pt: ["integração de modelos de IA em aplicações"], en: ["integrating AI models into applications"] },
+  },
+];
