@@ -1,53 +1,55 @@
 import { notFound } from "next/navigation";
-import { AboutSection } from "@/components/v2/AboutSection";
-import { ContactSection } from "@/components/v2/ContactSection";
-import { EducationSection } from "@/components/v2/EducationSection";
-import { ExperienceSection } from "@/components/v2/ExperienceSection";
-import { FooterV2 } from "@/components/v2/FooterV2";
-import { ImmersivePage } from "@/components/v2/ImmersivePage";
-import { StackSection } from "@/components/v2/StackSection";
-import { WorkSection } from "@/components/v2/WorkSection";
-import { buildContent } from "@/components/v2/content";
-import { buildFlow } from "@/components/v2/flow";
-import { isLocale, localePath } from "@/i18n/config";
-import { getImmersiveDictionary } from "@/i18n/immersive";
-import { getAvatarAssets } from "@/lib/model";
+import { About } from "@/components/site/About";
+import { Contact } from "@/components/site/Contact";
+import { ExperienceList } from "@/components/site/ExperienceList";
+import { Intro } from "@/components/site/Intro";
+import { ProjectDialog } from "@/components/site/ProjectDialog";
+import { ProjectList } from "@/components/site/ProjectList";
+import { Section } from "@/components/site/Section";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { buildHomeContent } from "@/components/site/content";
+import { isLocale } from "@/i18n/config";
+import { getHomeDictionary } from "@/i18n/home";
 import { jsonLdScript, siteJsonLd } from "@/lib/jsonld";
 import { getResumeUrl } from "@/lib/resume";
-import { legacyPath } from "@/lib/routes";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
-// Home do site. Metadata, canonical e hreflang vêm do layout de [locale].
+// Home editorial. Tudo é renderizado no servidor; só o seletor de idioma e o painel de projeto rodam no cliente.
+// Metadata, canonical e hreflang vêm do layout de [locale].
 export default async function HomePage({ params }: PageProps) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const ui = getImmersiveDictionary(locale);
-  const content = buildContent(locale);
+  const ui = getHomeDictionary(locale);
+  const content = buildHomeContent(locale);
+  // Sem o PDF em public/resume, retorna null e os links de currículo não aparecem.
   const resumeUrl = getResumeUrl(locale);
 
-  // Só a casca com scroll e 3D é client; as seções de conteúdo são renderizadas no servidor.
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(siteJsonLd(locale))} />
-      <ImmersivePage
-        locale={locale}
-        ui={ui}
-        avatar={getAvatarAssets()}
-        resumeUrl={resumeUrl}
-        links={content.links}
-        hero={{ name: content.name, role: content.role, headline: content.headline }}
-        flow={buildFlow(content)}
-        footer={<FooterV2 ui={ui} name={content.name} role={content.role} classicHref={localePath(locale, legacyPath)} />}
-      >
-        <AboutSection ui={ui} content={content} />
-        <StackSection ui={ui} content={content} />
-        <ExperienceSection ui={ui} content={content} />
-        <WorkSection ui={ui} projects={content.projects} repositories={content.links.repositories} />
-        <EducationSection ui={ui} content={content} />
-        <ContactSection ui={ui} email={content.email} links={content.links} resumeUrl={resumeUrl} />
-      </ImmersivePage>
+      <div className="mx-auto max-w-content px-gutter">
+        <SiteHeader locale={locale} ui={ui} resumeUrl={resumeUrl} />
+        <main id="content">
+          <Intro ui={ui} headline={content.headline} github={content.links.github} />
+          <Section id="projects" title={ui.projects.title}>
+            <ProjectList projects={content.projects} ui={ui} />
+          </Section>
+          <Section id="experience" title={ui.experience.title}>
+            <ExperienceList jobs={content.experience} ui={ui} />
+          </Section>
+          <Section id="about" title={ui.about.title}>
+            <About content={content} ui={ui} />
+          </Section>
+          <Section id="contact" title={ui.contact.title}>
+            <Contact ui={ui} email={content.email} links={content.links} resumeUrl={resumeUrl} />
+          </Section>
+        </main>
+        <SiteFooter ui={ui} />
+      </div>
+      <ProjectDialog projects={content.projects} labels={ui.dialog} />
     </>
   );
 }

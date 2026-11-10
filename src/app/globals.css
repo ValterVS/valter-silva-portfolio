@@ -30,29 +30,57 @@
 
 @layer base {
   html {
-    color-scheme: dark;
+    color-scheme: light;
     scroll-behavior: smooth;
-    scroll-padding-top: 5.5rem;
+    scroll-padding-top: 1.5rem;
     -webkit-text-size-adjust: 100%;
   }
 
   body {
-    background: var(--color-bg);
-    color: var(--color-fg);
-    font-family: var(--font-sans);
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-text);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-optical-sizing: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: clip;
   }
 
   ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Páginas ainda no visual antigo (projetos e /v1): reaplica a paleta escura só dentro delas */
+  html:has(.legacy-theme) {
+    color-scheme: dark;
+    scroll-padding-top: 5.5rem;
+    background: var(--color-bg);
+  }
+
+  .legacy-theme {
+    min-height: 100svh;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+
+  .legacy-theme ::selection {
     background: rgb(56 189 248 / 0.3);
     color: #fff;
   }
 
-  :focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 3px;
+  .legacy-theme :focus-visible {
+    outline-color: var(--color-accent);
     border-radius: 6px;
   }
 

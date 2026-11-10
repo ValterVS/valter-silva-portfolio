@@ -87,7 +87,7 @@
   --spacing-stack: 1rem;
 
   /* Larguras: max-w-content (página), max-w-measure (linha de leitura) */
-  --container-content: 72rem;
+  --container-content: 67.5rem; /* ~1080px */
   --container-measure: 66ch;
 
   /* Raio discreto, para controles; seções não usam cantos arredondados */

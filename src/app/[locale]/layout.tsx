@@ -2,26 +2,19 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter, Newsreader } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { MotionProvider } from "@/components/MotionProvider";
 import { htmlLang, isLocale, localePath, locales, ogLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/ui";
 import { profile, siteUrl } from "@/data/profile";
 import "../globals.css";
 
-const sans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
-const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+// Fontes da home editorial (tokens font-text e font-display em design-tokens.css).
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+// Sem o eixo opsz e sem itálico: cada um quase triplicava o peso da fonte (medido: 129 KiB + 144 KiB).
+const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-newsreader", display: "swap" });
 
-// Fontes do redesign editorial (tokens font-text e font-display em design-tokens.css).
-// preload desligado enquanto nenhuma seção as usa: o navegador só baixa uma fonte
-// quando algum texto a utiliza. Ligar o preload quando as seções novas entrarem.
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap", preload: false });
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  variable: "--font-newsreader",
-  axes: ["opsz"],
-  display: "swap",
-  preload: false,
-});
+// Geist só é usada pelas páginas antigas (projetos e /v1), por isso sem preload na home.
+const sans = Geist({ subsets: ["latin"], variable: "--font-geist-sans", preload: false });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", preload: false });
 
 type LayoutProps = {
   children: ReactNode;
@@ -34,9 +27,10 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+// Tema claro. As páginas antigas (projetos e /v1) sobrescrevem com o tema escuro nos próprios layouts.
 export const viewport: Viewport = {
-  themeColor: "#06080c",
-  colorScheme: "dark",
+  themeColor: "#f6f5f0",
+  colorScheme: "light",
 };
 
 export async function generateMetadata({ params }: Omit<LayoutProps, "children">): Promise<Metadata> {
@@ -97,11 +91,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
       <body>
         <a
           href="#content"
-          className="fixed top-3 left-3 z-[60] -translate-y-20 rounded-full bg-accent px-4 py-2 text-sm font-medium text-bg transition-transform focus:translate-y-0"
+          className="fixed top-3 left-3 z-[60] -translate-y-20 rounded-control bg-primary px-4 py-2 text-small font-medium text-primary-foreground focus:translate-y-0"
         >
           {dict.a11y.skip}
         </a>
-        <MotionProvider>{children}</MotionProvider>
+        {children}
       </body>
     </html>
   );
