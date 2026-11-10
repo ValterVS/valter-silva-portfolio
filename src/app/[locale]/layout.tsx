@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Newsreader } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { MotionProvider } from "@/components/MotionProvider";
@@ -10,6 +10,18 @@ import "../globals.css";
 
 const sans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+
+// Fontes do redesign editorial (tokens font-text e font-display em design-tokens.css).
+// preload desligado enquanto nenhuma seção as usa: o navegador só baixa uma fonte
+// quando algum texto a utiliza. Ligar o preload quando as seções novas entrarem.
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap", preload: false });
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  axes: ["opsz"],
+  display: "swap",
+  preload: false,
+});
 
 type LayoutProps = {
   children: ReactNode;
@@ -81,7 +93,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
   const dict = getDictionary(locale);
 
   return (
-    <html lang={htmlLang[locale]} className={`${sans.variable} ${mono.variable}`}>
+    <html lang={htmlLang[locale]} className={`${sans.variable} ${mono.variable} ${inter.variable} ${newsreader.variable}`}>
       <body>
         <a
           href="#content"

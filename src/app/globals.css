@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Design system do redesign editorial (ainda não aplicado às seções atuais) */
+@import "./design-tokens.css";
 
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
