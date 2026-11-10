@@ -1,6 +1,6 @@
 import type { Localized } from "@/i18n/config";
 
-export const siteUrl = "https://valtersilva.dev.br";
+export const siteUrl = "https://www.valtersilva.dev.br";
 
 // Dados pessoais e links exibidos no site. Substitua aqui se algo mudar.
 export const profile = {
