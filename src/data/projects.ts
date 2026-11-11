@@ -215,7 +215,7 @@ export const projects: Project[] = [
     slug: "jurimetria-ia",
     category: { pt: "IA aplicada · Full-stack", en: "Applied AI · Full stack" },
     keyTechnologies: ["Node.js", "React", "PostgreSQL", "Anthropic API"],
-    title: { pt: "Jurimetria IA", en: "Jurimetria AI" },
+    title: "Jurimetria IA",
     description: {
       pt: "TCC: sistema de acompanhamento de processos que usa IA para resumir decisões judiciais e alimentar um painel de jurimetria.",
       en: "Capstone project: a case tracking system that uses AI to summarize court rulings and feed a jurimetrics dashboard.",
