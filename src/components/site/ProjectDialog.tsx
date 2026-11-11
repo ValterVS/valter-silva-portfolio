@@ -82,6 +82,9 @@ export function ProjectDialog({ projects, labels }: { projects: ProjectView[]; l
   // Quem abriu o painel (link da lista) e qual projeto estava aberto, para devolver o foco ao fechar.
   const opener = useRef<HTMLElement | null>(null);
   const shownSlug = useRef<string | null>(null);
+  // O evento "close" chega depois, numa tarefa separada. Marcamos quando o fechamento partiu daqui
+  // (URL já sem ?project=) para não confundi-lo com um Escape e voltar o histórico uma vez a mais.
+  const closingFromUrl = useRef(false);
 
   useEffect(() => {
     const element = dialog.current;
@@ -95,7 +98,10 @@ export function ProjectDialog({ projects, labels }: { projects: ProjectView[]; l
       }
       return;
     }
-    if (element.open) element.close();
+    if (element.open) {
+      closingFromUrl.current = true;
+      element.close();
+    }
     if (!shownSlug.current) return;
     // Vale para todas as formas de fechar (Escape, botão, Voltar, clique fora). Aberto pela URL
     // direta, não há quem o tenha aberto: o foco vai para o título do projeto na lista.
@@ -127,7 +133,14 @@ export function ProjectDialog({ projects, labels }: { projects: ProjectView[]; l
     <dialog
       ref={dialog}
       aria-labelledby="project-title"
-      onClose={() => currentSlug() && closeProject()}
+      onClose={() => {
+        if (closingFromUrl.current) {
+          closingFromUrl.current = false;
+          return;
+        }
+        // Fechado pelo navegador (Escape): sincroniza a URL.
+        if (currentSlug()) closeProject();
+      }}
       onClick={(event) => event.target === event.currentTarget && closeProject()}
       className={cx(
         "m-0 ml-auto h-dvh max-h-dvh w-full max-w-[min(48rem,100vw)] overflow-y-auto overscroll-contain border-l border-border bg-background p-0 text-foreground",
