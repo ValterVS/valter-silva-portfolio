@@ -1,6 +1,6 @@
 import type { Localized } from "@/i18n/config";
 
-export const siteUrl = "https://valtersilva.dev.br";
+export const siteUrl = "https://www.valtersilva.dev.br";
 
 // Dados pessoais e links exibidos no site. Substitua aqui se algo mudar.
 export const profile = {
@@ -27,9 +27,10 @@ export const profile = {
     en: "/resume/resume-valter-silva-en.pdf",
   } satisfies Localized,
 
+  // Apresentação da home (abaixo do "Olá, eu sou o Valter."). Também usada na descrição do JSON-LD.
   headline: {
-    pt: "Desenvolvedor de software com foco em backend: APIs e sistemas com Java, Spring Boot e bancos de dados.",
-    en: "Software developer focused on backend: APIs and systems built with Java, Spring Boot and databases.",
+    pt: "Trabalho com desenvolvimento backend, principalmente Java e Spring Boot. Também desenvolvo aplicações web com React e exploro integrações de inteligência artificial em projetos.",
+    en: "I work on backend development, mainly with Java and Spring Boot. I also build web applications with React and explore AI integrations in my projects.",
   } satisfies Localized,
 
   statement: {
@@ -44,12 +45,12 @@ export const profile = {
 
   about: {
     pt: [
-      "Estou na fase final de Engenharia de Software na Unilins e me especializando em desenvolvimento backend: Java, Spring Boot, APIs REST, modelagem de dados com PostgreSQL e arquitetura de software.",
-      "Me interesso por regras de negócio, integração entre sistemas e confiabilidade. A experiência com suporte L2 me deu um olhar prático sobre o que acontece depois do deploy: incidentes, causa raiz e estabilidade.",
+      "Estou na reta final de Engenharia de Software na Unilins. O que mais me prende na área é investigar: entender por que um sistema se comporta de determinado jeito, seguir o código e os logs até encontrar a causa e só então mudar alguma coisa.",
+      "No suporte L2 da Solutis, isso era rotina: incidentes, causa raiz, estabilidade. No desenvolvimento, é o que me faz gostar de backend: regras de negócio, modelagem de dados e APIs que precisam continuar funcionando depois do deploy.",
     ],
     en: [
-      "I'm in the final stage of a Software Engineering degree at Unilins, specializing in backend development: Java, Spring Boot, REST APIs, data modeling with PostgreSQL and software architecture.",
-      "I'm drawn to business rules, system integration and reliability. Working in L2 support gave me a practical view of what happens after deployment: incidents, root causes and stability.",
+      "I'm in the final stretch of a Software Engineering degree at Unilins. What keeps me hooked is investigating: figuring out why a system behaves the way it does, following the code and the logs until the cause turns up, and only then changing something.",
+      "In L2 support at Solutis that was the daily routine — incidents, root causes, stability. In development, it's what draws me to backend work: business rules, data modeling and APIs that have to keep working after the deploy.",
     ],
   } satisfies Localized<string[]>,
 };

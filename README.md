@@ -2,7 +2,7 @@
 
 Meu portfólio pessoal, desenvolvido para apresentar minha experiência, projetos e tecnologias que utilizo.
 
-🌐 [valtersilva.dev.br](https://valtersilva.dev.br)
+🌐 [valtersilva.dev.br](https://www.valtersilva.dev.br)
 
 ## Tecnologias
 

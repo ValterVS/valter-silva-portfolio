@@ -30,6 +30,9 @@ export type Project = {
   image?: string;
   screenshots?: string[];
   featured?: boolean;
+  // Linha de categoria e tecnologias principais da lista da home (subconjunto de technologies).
+  category?: Localized;
+  keyTechnologies?: string[];
   year?: string;
   authors?: string;
   // Com details preenchido, o projeto ganha a página /projects/<slug>.
@@ -40,6 +43,8 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "orca-ai",
+    category: { pt: "Backend · SaaS multiempresa", en: "Backend · Multi-tenant SaaS" },
+    keyTechnologies: ["Java 25", "Spring Boot 4", "PostgreSQL", "Next.js"],
     title: "Orça Aí",
     description: {
       pt: "SaaS multiempresa para orçamentos e propostas de empresas de obras e reformas, com backend em Spring Boot.",
@@ -132,6 +137,8 @@ export const projects: Project[] = [
   },
   {
     slug: "eitanol",
+    category: { pt: "Backend · Dados geográficos", en: "Backend · Geospatial data" },
+    keyTechnologies: ["Java 25", "Spring Boot 4", "PostgreSQL", "PostGIS"],
     title: "EiTanol",
     description: {
       pt: "Plataforma que compara preços de combustíveis por região para mostrar onde realmente compensa abastecer.",
@@ -206,6 +213,8 @@ export const projects: Project[] = [
   },
   {
     slug: "jurimetria-ia",
+    category: { pt: "IA aplicada · Full-stack", en: "Applied AI · Full stack" },
+    keyTechnologies: ["Node.js", "React", "PostgreSQL", "Anthropic API"],
     title: { pt: "Jurimetria IA", en: "Jurimetria AI" },
     description: {
       pt: "TCC: sistema de acompanhamento de processos que usa IA para resumir decisões judiciais e alimentar um painel de jurimetria.",
