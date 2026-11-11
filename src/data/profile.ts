@@ -21,7 +21,7 @@ export const profile = {
     repositories: "https://github.com/ValterVS?tab=repositories",
     linkedin: "https://www.linkedin.com/in/valter-silva-eng/",
   },
-  // Coloque os PDFs em public/resume com estes nomes. Se um faltar, o site usa o outro.
+  // PDFs em public/resume com estes nomes (veja docs/assets.md). Sem o arquivo do idioma, o link não aparece.
   resume: {
     pt: "/resume/curriculo-valter-silva-pt.pdf",
     en: "/resume/resume-valter-silva-en.pdf",

@@ -39,7 +39,7 @@ export function Contact({ ui, email, links, resumeUrl }: ContactProps) {
           <div className="grid gap-x-8 border-b border-border py-2 sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-center">
             <dt className="pt-2 text-small text-foreground-muted sm:pt-0">{ui.contact.resume}</dt>
             <dd>
-              <a href={resumeUrl} download className={`${textLink} inline-flex min-h-11 items-center`}>
+              <a href={resumeUrl} download type="application/pdf" className={`${textLink} inline-flex min-h-11 items-center`}>
                 {ui.contact.resumeLink}
               </a>
             </dd>

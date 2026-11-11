@@ -44,7 +44,7 @@ export function SiteHeader({ locale, ui, resumeUrl, paths, anchorBase = "" }: He
 
       <div className="col-start-2 row-start-1 flex items-center gap-5 md:col-start-3">
         {resumeUrl && (
-          <a href={resumeUrl} download className={`${textLink} text-small`}>
+          <a href={resumeUrl} download type="application/pdf" className={`${textLink} inline-flex min-h-11 items-center text-small`}>
             <span className="sm:hidden">{ui.nav.resumeShort}</span>
             <span className="hidden sm:inline">{ui.nav.resume}</span>
           </a>
