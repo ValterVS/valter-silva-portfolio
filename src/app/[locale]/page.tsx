@@ -6,10 +6,9 @@ import { Intro } from "@/components/site/Intro";
 import { ProjectDialog } from "@/components/site/ProjectDialog";
 import { ProjectList } from "@/components/site/ProjectList";
 import { Section } from "@/components/site/Section";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteShell } from "@/components/site/SiteShell";
 import { buildHomeContent } from "@/components/site/content";
-import { isLocale } from "@/i18n/config";
+import { isLocale, localePath, locales, type Locale } from "@/i18n/config";
 import { getHomeDictionary } from "@/i18n/home";
 import { jsonLdScript, siteJsonLd } from "@/lib/jsonld";
 import { getResumeUrl } from "@/lib/resume";
@@ -26,29 +25,26 @@ export default async function HomePage({ params }: PageProps) {
   const content = buildHomeContent(locale);
   // Sem o PDF em public/resume, retorna null e os links de currículo não aparecem.
   const resumeUrl = getResumeUrl(locale);
+  const homePaths = Object.fromEntries(locales.map((option) => [option, localePath(option)])) as Record<Locale, string>;
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(siteJsonLd(locale))} />
-      <div className="mx-auto max-w-content px-gutter">
-        <SiteHeader locale={locale} ui={ui} resumeUrl={resumeUrl} />
-        <main id="content">
-          <Intro ui={ui} headline={content.headline} github={content.links.github} />
-          <Section id="projects" title={ui.projects.title}>
-            <ProjectList projects={content.projects} ui={ui} />
-          </Section>
-          <Section id="experience" title={ui.experience.title}>
-            <ExperienceList jobs={content.experience} ui={ui} />
-          </Section>
-          <Section id="about" title={ui.about.title}>
-            <About content={content} ui={ui} />
-          </Section>
-          <Section id="contact" title={ui.contact.title}>
-            <Contact ui={ui} email={content.email} links={content.links} resumeUrl={resumeUrl} />
-          </Section>
-        </main>
-        <SiteFooter ui={ui} />
-      </div>
+      <SiteShell locale={locale} ui={ui} resumeUrl={resumeUrl} paths={homePaths}>
+        <Intro ui={ui} headline={content.headline} github={content.links.github} />
+        <Section id="projects" title={ui.projects.title}>
+          <ProjectList projects={content.projects} ui={ui} />
+        </Section>
+        <Section id="experience" title={ui.experience.title}>
+          <ExperienceList jobs={content.experience} ui={ui} />
+        </Section>
+        <Section id="about" title={ui.about.title}>
+          <About content={content} ui={ui} />
+        </Section>
+        <Section id="contact" title={ui.contact.title}>
+          <Contact ui={ui} email={content.email} links={content.links} resumeUrl={resumeUrl} />
+        </Section>
+      </SiteShell>
       <ProjectDialog projects={content.projects} labels={ui.dialog} />
     </>
   );
