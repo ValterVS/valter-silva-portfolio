@@ -186,11 +186,27 @@ export function ProjectDialog({ projects, labels }: { projects: ProjectView[]; l
   const slug = useSyncExternalStore(subscribe, currentSlug, () => null);
   const open = projects.find((project) => project.slug === slug) ?? null;
 
+  // Quem abriu o painel (link da lista) e qual projeto estava aberto, para devolver o foco ao fechar.
+  const opener = useRef<HTMLElement | null>(null);
+  const shownSlug = useRef<string | null>(null);
+
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
-    if (open && !element.open) element.showModal();
-    if (!open && element.open) element.close();
+    if (open) {
+      shownSlug.current = open.slug;
+      if (!element.open) element.showModal();
+      return;
+    }
+    if (element.open) element.close();
+    if (!shownSlug.current) return;
+    // Vale para todas as formas de fechar (Escape, botão, Voltar, clique fora). Aberto pela URL
+    // direta, não há quem o tenha aberto: o foco vai para o título do projeto na lista.
+    const fromUrl = !opener.current;
+    const target = opener.current ?? document.querySelector<HTMLElement>(`#project-${shownSlug.current} a`);
+    opener.current = null;
+    shownSlug.current = null;
+    target?.focus({ preventScroll: !fromUrl });
   }, [open]);
 
   // Clique normal em um link [data-project] da lista abre o painel; ctrl/cmd/shift-clique
@@ -203,6 +219,7 @@ export function ProjectDialog({ projects, labels }: { projects: ProjectView[]; l
       const target = link?.dataset.project;
       if (!target || !slugs.has(target)) return;
       event.preventDefault();
+      opener.current = link ?? null;
       openProject(target);
     }
     document.addEventListener("click", onClick);
