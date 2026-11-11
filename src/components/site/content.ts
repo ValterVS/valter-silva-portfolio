@@ -3,7 +3,7 @@ import { getDictionary } from "@/i18n/ui";
 import { courses, education } from "@/data/education";
 import { experience } from "@/data/experience";
 import { profile } from "@/data/profile";
-import { getProject } from "@/data/projects";
+import { getProject, type Project } from "@/data/projects";
 import { essentialSkills } from "@/data/skills";
 
 // Projetos da home, nesta ordem.
@@ -19,36 +19,45 @@ function formatMonth(value: string, locale: Locale) {
   return `${part("month")} ${part("year")}`;
 }
 
-function buildProjects(locale: Locale) {
+// Visão de um projeto no idioma atual: usada na lista da home, no painel e na página do projeto.
+export function buildProjectView(project: Project, locale: Locale) {
   const dict = getDictionary(locale);
+  const details = project.details;
+  return {
+    slug: project.slug,
+    title: text(project.title, locale),
+    description: project.description[locale],
+    category: project.category?.[locale] ?? null,
+    status: project.status ? dict.projects.status[project.status] : null,
+    academic: project.categories.includes("academic") ? dict.projects.academic : null,
+    year: project.year ?? null,
+    authors: project.authors ?? null,
+    keyTechnologies: project.keyTechnologies ?? project.technologies.slice(0, 4),
+    technologies: project.technologies,
+    plannedTechnologies: project.plannedTechnologies ?? [],
+    github: project.github ?? null,
+    live: project.live ?? null,
+    href: details ? localePath(locale, `/projects/${project.slug}`) : null,
+    // Só capturas reais declaradas em src/data/projects.ts.
+    gallery: [project.image, ...(project.screenshots ?? [])].filter((src): src is string => Boolean(src)),
+    problem: details?.problem?.[locale] ?? null,
+    solution: details?.solution?.[locale] ?? null,
+    decisions: details?.architecture?.[locale] ?? [],
+    role: details?.role?.[locale] ?? [],
+    features: details?.features?.[locale] ?? [],
+    challenges: details?.challenges?.[locale] ?? [],
+    learnings: details?.learnings?.[locale] ?? [],
+  };
+}
+
+function buildProjects(locale: Locale) {
   return selectedProjectSlugs.flatMap((slug) => {
     const project = getProject(slug);
-    if (!project) return [];
-    return [
-      {
-        slug: project.slug,
-        title: text(project.title, locale),
-        description: project.description[locale],
-        category: project.category?.[locale] ?? null,
-        status: project.status ? dict.projects.status[project.status] : null,
-        academic: project.categories.includes("academic") ? dict.projects.academic : null,
-        year: project.year ?? null,
-        keyTechnologies: project.keyTechnologies ?? project.technologies.slice(0, 4),
-        technologies: project.technologies,
-        github: project.github ?? null,
-        live: project.live ?? null,
-        href: project.details ? localePath(locale, `/projects/${project.slug}`) : null,
-        // Só capturas reais declaradas em src/data/projects.ts.
-        gallery: [project.image, ...(project.screenshots ?? [])].filter((src): src is string => Boolean(src)),
-        problem: project.details?.problem?.[locale] ?? null,
-        solution: project.details?.solution?.[locale] ?? null,
-        role: project.details?.role?.[locale] ?? [],
-      },
-    ];
+    return project ? [buildProjectView(project, locale)] : [];
   });
 }
 
-export type ProjectView = ReturnType<typeof buildProjects>[number];
+export type ProjectView = ReturnType<typeof buildProjectView>;
 
 export function buildHomeContent(locale: Locale) {
   return {

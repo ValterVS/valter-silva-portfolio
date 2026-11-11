@@ -1,17 +1,17 @@
 "use client";
 
-import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, X } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
+import { ArrowRight, X } from "lucide-react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import type { HomeDictionary } from "@/i18n/home";
 import { cx } from "@/lib/styles";
 import type { ProjectView } from "./content";
+import { ProjectDetail } from "./ProjectDetail";
 import { textLink } from "./ui";
 
-type Labels = HomeDictionary["dialog"];
+type Labels = HomeDictionary["project"];
 
 // O projeto aberto fica na URL (?project=slug): o link pode ser compartilhado e o "voltar" do navegador fecha o painel.
-// Lógica herdada do painel anterior (ProjectShowcase); o refinamento completo fica para a Etapa 3.
+// Sem JS, os links da lista levam à página completa /projects/<slug>, com o mesmo conteúdo (ProjectDetail).
 const changeEvent = "projectchange";
 
 function subscribe(callback: () => void) {
@@ -43,71 +43,23 @@ function closeProject() {
   window.dispatchEvent(new Event(changeEvent));
 }
 
-function Gallery({ project, labels }: { project: ProjectView; labels: Labels }) {
-  const [index, setIndex] = useState(0);
-  const images = project.gallery;
-  const total = images.length;
-  const step = (delta: number) => setIndex((current) => (current + delta + total) % total);
-
-  function onKeyDown(event: KeyboardEvent) {
-    if (total < 2) return;
-    if (event.key === "ArrowRight") step(1);
-    if (event.key === "ArrowLeft") step(-1);
-  }
-
-  // Sem captura real, não há galeria (nada de imagem provisória).
-  if (total === 0) return null;
-
-  const control =
-    "grid size-11 place-items-center rounded-control border border-border-strong bg-background text-foreground transition-colors hover:border-foreground";
-
-  return (
-    <div role="group" aria-roledescription="carousel" aria-label={labels.gallery} onKeyDown={onKeyDown} className="mt-8">
-      <div className="relative aspect-video overflow-hidden border border-border bg-background-subtle">
-        <Image
-          src={images[index]}
-          alt={`${project.title} — ${index + 1}/${total}`}
-          fill
-          sizes="(min-width: 768px) 44rem, 100vw"
-          className="object-cover"
-        />
-      </div>
-      {total > 1 && (
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <button type="button" onClick={() => step(-1)} aria-label={labels.previous} className={control}>
-            <ChevronLeft size={18} aria-hidden="true" />
-          </button>
-          <p aria-live="polite" className="text-small text-foreground-muted tabular-nums">
-            {index + 1} / {total}
-          </p>
-          <button type="button" onClick={() => step(1)} aria-label={labels.next} className={control}>
-            <ChevronRight size={18} aria-hidden="true" />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Block({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="border-t border-border pt-5">
-      <h3 className="text-small font-semibold">{title}</h3>
-      <div className="mt-2">{children}</div>
-    </section>
-  );
-}
-
+// Barra fixa do painel: link para a página completa e botão de fechar (recebe o foco ao abrir).
 function ProjectPanel({ project, labels }: { project: ProjectView; labels: Labels }) {
-  const meta = [project.category, project.status, project.academic, project.year].filter(Boolean).join(" · ");
-
   return (
-    <div className="px-gutter pb-12">
-      <div className="sticky top-0 z-10 -mx-gutter flex items-center justify-between gap-4 border-b border-border bg-background px-gutter py-2">
-        <p className="text-caption text-foreground-muted">{meta}</p>
+    <>
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-background px-gutter py-2">
+        {project.href ? (
+          <a href={project.href} className={`${textLink} inline-flex min-h-11 items-center gap-1.5 text-small`}>
+            {labels.page}
+            <span className="sr-only">: {project.title}</span>
+            <ArrowRight size={14} aria-hidden="true" />
+          </a>
+        ) : (
+          <span />
+        )}
         <button
           type="button"
-          autoFocus
+          data-dialog-close
           onClick={closeProject}
           className="inline-flex h-11 shrink-0 items-center gap-2 rounded-control border border-border-strong px-3 text-small transition-colors hover:border-foreground"
         >
@@ -115,69 +67,10 @@ function ProjectPanel({ project, labels }: { project: ProjectView; labels: Label
           {labels.close}
         </button>
       </div>
-
-      <h2 id="project-title" className="mt-8 font-display text-title font-medium">
-        {project.title}
-      </h2>
-      <p className="mt-4 text-lead text-pretty text-foreground-muted">{project.description}</p>
-
-      <Gallery project={project} labels={labels} />
-
-      <div className="mt-10 space-y-8">
-        {project.problem && (
-          <Block title={labels.problem}>
-            <p className="text-pretty">{project.problem}</p>
-          </Block>
-        )}
-        {project.solution && (
-          <Block title={labels.solution}>
-            <p className="text-pretty">{project.solution}</p>
-          </Block>
-        )}
-        {project.role.length > 0 && (
-          <Block title={labels.role}>
-            <ul className="space-y-1.5">
-              {project.role.map((item) => (
-                <li key={item} className="grid grid-cols-[1rem_minmax(0,1fr)] text-pretty">
-                  <span aria-hidden="true" className="text-foreground-muted">
-                    –
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </Block>
-        )}
-        {project.technologies.length > 0 && (
-          <Block title={labels.stack}>
-            <p>{project.technologies.join(" · ")}</p>
-          </Block>
-        )}
+      <div className="px-gutter pt-8 pb-12">
+        <ProjectDetail project={project} labels={labels} variant="dialog" titleId="project-title" />
       </div>
-
-      {(project.github || project.live || project.href) && (
-        <div className="mt-10 flex flex-wrap gap-x-6 border-t border-border pt-3 text-small">
-          {project.github && (
-            <a href={project.github} target="_blank" rel="noreferrer" className={`${textLink} inline-flex min-h-11 items-center gap-1.5`}>
-              GitHub
-              <ArrowUpRight size={14} aria-hidden="true" />
-            </a>
-          )}
-          {project.live && (
-            <a href={project.live} target="_blank" rel="noreferrer" className={`${textLink} inline-flex min-h-11 items-center gap-1.5`}>
-              {labels.live}
-              <ArrowUpRight size={14} aria-hidden="true" />
-            </a>
-          )}
-          {project.href && (
-            <a href={project.href} className={`${textLink} inline-flex min-h-11 items-center gap-1.5`}>
-              {labels.page}
-              <ArrowRight size={14} aria-hidden="true" />
-            </a>
-          )}
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 
@@ -195,7 +88,11 @@ export function ProjectDialog({ projects, labels }: { projects: ProjectView[]; l
     if (!element) return;
     if (open) {
       shownSlug.current = open.slug;
-      if (!element.open) element.showModal();
+      if (!element.open) {
+        element.showModal();
+        // Foco inicial no botão Fechar (o navegador focaria o primeiro link do painel).
+        element.querySelector<HTMLElement>("[data-dialog-close]")?.focus();
+      }
       return;
     }
     if (element.open) element.close();

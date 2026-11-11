@@ -45,7 +45,7 @@ export default async function HomePage({ params }: PageProps) {
           <Contact ui={ui} email={content.email} links={content.links} resumeUrl={resumeUrl} />
         </Section>
       </SiteShell>
-      <ProjectDialog projects={content.projects} labels={ui.dialog} />
+      <ProjectDialog projects={content.projects} labels={ui.project} />
     </>
   );
 }
