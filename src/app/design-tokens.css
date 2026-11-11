@@ -68,9 +68,12 @@
   --text-title: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
   --text-title--line-height: 1.15;
   --text-title--letter-spacing: -0.015em;
+  /* Subtítulo: posicionamento na apresentação e títulos de itens (projetos, experiência) */
+  --text-subtitle: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+  --text-subtitle--line-height: 1.25;
   --text-heading: 1.25rem;
   --text-heading--line-height: 1.35;
-  --text-lead: 1.1875rem;
+  --text-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
   --text-lead--line-height: 1.6;
   --text-body: 1rem;
   --text-body--line-height: 1.65;
@@ -82,7 +85,7 @@
 
   /* Espaçamento semântico: px-gutter, py-section, mt-block, gap-stack… */
   --spacing-gutter: clamp(1rem, 0.6rem + 1.8vw, 2rem);
-  --spacing-section: clamp(4rem, 3rem + 4vw, 7rem);
+  --spacing-section: clamp(3.5rem, 2.5rem + 3vw, 5.5rem);
   --spacing-block: clamp(2rem, 1.5rem + 2vw, 3rem);
   --spacing-stack: 1rem;
 

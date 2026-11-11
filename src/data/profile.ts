@@ -29,8 +29,8 @@ export const profile = {
 
   // Apresentação da home (abaixo do "Olá, eu sou o Valter."). Também usada na descrição do JSON-LD.
   headline: {
-    pt: "Trabalho principalmente no backend, com Java e Spring Boot: APIs, modelagem de dados e regras de negócio. Quando o projeto pede, também construo a interface com React e Next.js. No Jurimetria IA, meu TCC, usamos um modelo de IA para resumir decisões judiciais em uma saída estruturada, que o backend valida antes de salvar.",
-    en: "I work mostly on the backend with Java and Spring Boot — APIs, data modeling and business rules. When a project calls for it, I build the front end too, with React and Next.js. In Jurimetria IA, my capstone project, we used an AI model to turn court rulings into structured summaries that the backend validates before saving them.",
+    pt: "Trabalho com desenvolvimento backend, principalmente Java e Spring Boot. Também desenvolvo aplicações web com React e exploro integrações de inteligência artificial em projetos.",
+    en: "I work on backend development, mainly with Java and Spring Boot. I also build web applications with React and explore AI integrations in my projects.",
   } satisfies Localized,
 
   statement: {

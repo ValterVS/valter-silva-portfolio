@@ -6,9 +6,7 @@ export function About({ content, ui }: { content: HomeContent; ui: HomeDictionar
     <>
       <div className="max-w-measure space-y-5 text-pretty">
         {content.about.map((paragraph, index) => (
-          <p key={index} className={index === 0 ? "text-lead" : undefined}>
-            {paragraph}
-          </p>
+          <p key={index}>{paragraph}</p>
         ))}
       </div>
 
@@ -16,18 +14,21 @@ export function About({ content, ui }: { content: HomeContent; ui: HomeDictionar
         <div>
           <dt className="font-semibold">{ui.about.education}</dt>
           {content.education.map((item) => (
-            <dd key={item.course} className="mt-1 text-foreground-muted">
-              {item.course} — {item.institution}
-              <br />
-              {item.status} · {ui.about.location}
+            <dd key={item.course} className="mt-1">
+              {item.course}
+              <span className="block text-foreground-muted">{item.institution}</span>
+              <span className="block text-foreground-muted">
+                {item.status} · {ui.about.location}
+              </span>
             </dd>
           ))}
         </div>
         <div>
           <dt className="font-semibold">{ui.about.courses}</dt>
           {content.courses.map((course) => (
-            <dd key={course.title} className="mt-1 text-foreground-muted">
-              {course.title} — {course.instructor}
+            <dd key={course.title} className="mt-1">
+              {course.title}
+              <span className="block text-foreground-muted">{course.instructor}</span>
             </dd>
           ))}
         </div>
