@@ -18,8 +18,8 @@ A versão publicada no domínio deve continuar funcionando até o novo portfóli
 
 Commits locais podem ser criados sem pedir autorização a cada tarefa. Ao concluir cada tarefa ou etapa que modifique arquivos:
 
-1. Rodar as validações pertinentes: `npm run build`, `npm run lint`, `npm run typecheck` e os testes disponíveis
-   (ainda não há script `test` no projeto).
+1. Rodar as validações pertinentes: `npm run build`, `npm run lint`, `npm run typecheck` e `npm run test:e2e`
+   (Playwright; na primeira vez, `npx playwright install chromium`).
 2. Revisar `git status` e `git diff`.
 3. Conferir que nenhum arquivo temporário, segredo, credencial ou artefato de teste será commitado.
 4. Criar commits locais pequenos, claros e semânticos, no padrão Conventional Commits
