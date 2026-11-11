@@ -14,6 +14,14 @@ export type ProjectDetails = {
   role?: Localized<string[]>;
 };
 
+// Captura de tela real do projeto, salva em public/projects/<slug>/ (veja docs/assets.md).
+export type ProjectScreenshot = {
+  // Caminho público, ex.: "/projects/orca-ai/01-clientes.webp"
+  src: string;
+  // O que a tela mostra, nos dois idiomas (texto alternativo da imagem)
+  alt: Localized;
+};
+
 export type Project = {
   slug: string;
   title: string | Localized;
@@ -24,11 +32,9 @@ export type Project = {
   plannedTechnologies?: string[];
   github?: string;
   live?: string;
-  // Capturas reais em public/projects/<slug>/, ex.: image: "/projects/eitanol/cover.png" e
-  // screenshots: ["/projects/eitanol/01.png"]. A capa abre a galeria do painel; sem imagem, aparece um
-  // espaço reservado indicando que a captura ainda vai entrar.
-  image?: string;
-  screenshots?: string[];
+  // Só capturas reais, já revisadas (sem dados pessoais). A primeira também é a imagem de
+  // compartilhamento da página do projeto. Sem capturas, o projeto aparece só com texto.
+  screenshots?: ProjectScreenshot[];
   featured?: boolean;
   // Linha de categoria e tecnologias principais da lista da home (subconjunto de technologies).
   category?: Localized;

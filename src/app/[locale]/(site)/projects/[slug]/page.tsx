@@ -33,7 +33,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = text(project.title, locale);
   const description = project.description[locale];
   const path = `/projects/${project.slug}`;
-  const image = project.image ? { url: project.image, alt: title } : { url: `/og/${locale}`, width: 1200, height: 630, alt: title };
+  const cover = project.screenshots?.[0];
+  const image = cover ? { url: cover.src, alt: cover.alt[locale] } : { url: `/og/${locale}`, width: 1200, height: 630, alt: title };
 
   return {
     title,
@@ -68,7 +69,7 @@ function projectJsonLd(project: Project, locale: Locale) {
     ...(project.github && { codeRepository: project.github }),
     ...(project.live && { sameAs: project.live }),
     ...(project.year && { dateCreated: project.year }),
-    ...(project.image && { image: `${siteUrl}${project.image}` }),
+    ...(project.screenshots?.[0] && { image: `${siteUrl}${project.screenshots[0].src}` }),
   };
 }
 

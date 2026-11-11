@@ -92,7 +92,7 @@ export function ProjectDetail({ project, labels, variant, titleId }: ProjectDeta
 
       {project.gallery.length > 0 && (
         <div className="mt-8">
-          <ProjectGallery title={project.title} images={project.gallery} labels={labels} />
+          <ProjectGallery images={project.gallery} labels={labels} />
         </div>
       )}
 

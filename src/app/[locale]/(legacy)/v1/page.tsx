@@ -28,7 +28,7 @@ function projectCards(locale: Locale): ProjectCardData[] {
     technologies: project.technologies,
     github: project.github,
     live: project.live,
-    image: project.image,
+    image: project.screenshots?.[0]?.src,
     featured: Boolean(project.featured),
     year: project.year,
     href: project.details ? localePath(locale, `/projects/${project.slug}`) : null,

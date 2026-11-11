@@ -6,9 +6,11 @@ import { useState, type KeyboardEvent } from "react";
 
 type GalleryLabels = { gallery: string; previous: string; next: string };
 
+type GalleryImage = { src: string; alt: string };
+
 // Galeria de capturas reais (declaradas em src/data/projects.ts). Sem imagens, não renderiza nada:
 // o projeto aparece só com texto, sem imagem provisória.
-export function ProjectGallery({ title, images, labels }: { title: string; images: string[]; labels: GalleryLabels }) {
+export function ProjectGallery({ images, labels }: { images: GalleryImage[]; labels: GalleryLabels }) {
   const [index, setIndex] = useState(0);
   const total = images.length;
   if (total === 0) return null;
@@ -27,8 +29,8 @@ export function ProjectGallery({ title, images, labels }: { title: string; image
     <div role="group" aria-roledescription="carousel" aria-label={labels.gallery} onKeyDown={onKeyDown}>
       <div className="relative aspect-video overflow-hidden border border-border bg-background-subtle">
         <Image
-          src={images[index]}
-          alt={`${title} — ${index + 1}/${total}`}
+          src={images[index].src}
+          alt={images[index].alt}
           fill
           sizes="(min-width: 1024px) 50rem, 100vw"
           className="object-contain"

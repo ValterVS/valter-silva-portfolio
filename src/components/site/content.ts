@@ -39,7 +39,7 @@ export function buildProjectView(project: Project, locale: Locale) {
     live: project.live ?? null,
     href: details ? localePath(locale, `/projects/${project.slug}`) : null,
     // Só capturas reais declaradas em src/data/projects.ts.
-    gallery: [project.image, ...(project.screenshots ?? [])].filter((src): src is string => Boolean(src)),
+    gallery: (project.screenshots ?? []).map((shot) => ({ src: shot.src, alt: shot.alt[locale] })),
     problem: details?.problem?.[locale] ?? null,
     solution: details?.solution?.[locale] ?? null,
     decisions: details?.architecture?.[locale] ?? [],
