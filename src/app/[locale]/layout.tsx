@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 // Sem o eixo opsz e sem itálico: cada um quase triplicava o peso da fonte (medido: 129 KiB + 144 KiB).
 const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-newsreader", display: "swap" });
 
-// Geist só é usada pelas páginas antigas (projetos e /v1), por isso sem preload na home.
+// Geist só é usada pela versão antiga em /v1, por isso sem preload.
 const sans = Geist({ subsets: ["latin"], variable: "--font-geist-sans", preload: false });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", preload: false });
 
@@ -27,7 +27,7 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-// Tema claro. As páginas antigas (projetos e /v1) sobrescrevem com o tema escuro nos próprios layouts.
+// Tema claro. A versão antiga em /v1 sobrescreve com o tema escuro no próprio layout.
 export const viewport: Viewport = {
   themeColor: "#f6f5f0",
   colorScheme: "light",

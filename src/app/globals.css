@@ -59,7 +59,7 @@
     border-radius: 2px;
   }
 
-  /* Páginas ainda no visual antigo (projetos e /v1): reaplica a paleta escura só dentro delas */
+  /* Versão antiga em /v1: reaplica a paleta escura só dentro dela, até ser removida */
   html:has(.legacy-theme) {
     color-scheme: dark;
     scroll-padding-top: 5.5rem;

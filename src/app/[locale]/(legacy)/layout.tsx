@@ -9,7 +9,7 @@ import { getDictionary } from "@/i18n/ui";
 import { getResumeUrl } from "@/lib/resume";
 import { legacyPath } from "@/lib/routes";
 
-// Páginas ainda no visual antigo (escuro) até serem reconstruídas nas próximas etapas.
+// Versão antiga (escura) em /v1, mantida fora dos buscadores até ser removida.
 export const viewport: Viewport = {
   themeColor: "#06080c",
   colorScheme: "dark",
